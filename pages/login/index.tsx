@@ -6,6 +6,8 @@ import Image from "next/image";
 import React, { useState } from "react";
 import terniumLogo from "../../public/assets/imgs/ternium_logo_white.png";
 import { themeColors } from "../../config/theme";
+import { LockOutlined, MailOutline } from "@mui/icons-material";
+import Link from "next/link";
 
 const LoginTextField = styled(TextField)(({ theme }) => ({
   width: "clamp(35%, 320px, 80%)",
@@ -99,13 +101,13 @@ const Login = () => {
                 label='Correo Electronico'
                 variant='filled'
                 required
-                // InputProps={{
-                //     startAdornment: (
-                //         <InputAdornment position="start">
-                //             <MailOutline sx={{ mr: 1 }} />
-                //         </InputAdornment>
-                //     ),
-                // }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position='start'>
+                      <MailOutline sx={{ mr: 1 }} />
+                    </InputAdornment>
+                  ),
+                }}
                 value={username}
                 onChange={(e) => setUsername(e.target.value.trim())}
               />
@@ -115,21 +117,23 @@ const Login = () => {
                 type='password'
                 variant='filled'
                 required
-                // InputProps={{
-                //     startAdornment: (
-                //         <InputAdornment position="start">
-                //             <LockOutlined sx={{ mr: 1 }} />
-                //         </InputAdornment>
-                //     ),
-                //     required: true,
-                // }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position='start'>
+                      <LockOutlined sx={{ mr: 1 }} />
+                    </InputAdornment>
+                  ),
+                  required: true,
+                }}
                 value={password}
                 onChange={(e) => setPassword(e.target.value.trim())}
               />
             </Stack>
-            <LoginButton variant='outlined' type='submit'>
-              Entrar
-            </LoginButton>
+            <Link href='/search'>
+              <LoginButton variant='outlined' type='submit'>
+                Entrar
+              </LoginButton>
+            </Link>
           </Stack>
         </form>
       </Stack>
