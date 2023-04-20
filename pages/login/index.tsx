@@ -69,7 +69,7 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleOnSubmit = (e) => {
+  const handleOnSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
   };
 
