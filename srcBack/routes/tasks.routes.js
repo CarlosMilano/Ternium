@@ -3,9 +3,6 @@ const {getAllEployees} = require("../controllers/tasks.controller")
 
 const router = Router();
 
-// login
-
-router.get("/login", )
 
 // Empleados
 

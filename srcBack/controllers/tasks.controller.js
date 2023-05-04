@@ -1,10 +1,5 @@
 const db = require("../db");
 
-// Login
-
-(req, res) => {
-    res.send("Email y Contraseña");
-}
 
 // Empleados
 
