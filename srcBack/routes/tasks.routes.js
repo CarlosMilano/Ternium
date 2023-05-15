@@ -1,5 +1,5 @@
 const {Router} = require("express");
-const {getAllEmployees} = require("../controllers/tasks.controller")
+const {getAllEmployees, getTablas, updateTablaEmpleado} = require("../controllers/tasks.controller")
 
 const router = Router();
 
@@ -10,9 +10,9 @@ router.get("/empleados", getAllEmployees)
 
 // Ficha de empleados
 
-router.get("/ficha", )
+router.get("/ficha", getTablas)
 
-router.put("/ficha", )
+router.put("/ficha/:id_empleado", updateTablaEmpleado)
 
 
 
