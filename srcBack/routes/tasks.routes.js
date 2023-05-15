@@ -1,19 +1,18 @@
 const {Router} = require("express");
-const {getAllEployees} = require("../controllers/tasks.controller")
+const {getAllEmployees} = require("../controllers/tasks.controller")
 
 const router = Router();
 
 
 // Empleados
 
-router.get("/empleados", getAllEployees )
+router.get("/empleados", getAllEmployees)
 
 // Ficha de empleados
 
 router.get("/ficha", )
 
 router.put("/ficha", )
-
 
 
 
