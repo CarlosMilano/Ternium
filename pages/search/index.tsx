@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { themeColors } from "@/config/theme";
 import {
   ExitToApp,
@@ -25,10 +26,40 @@ import { DataGrid } from "@mui/x-data-grid";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
 import terniumLogo from "../../public/assets/imgs/ternium_color.png";
 
 function Search() {
+
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/example');
+        const result = await response.json();
+        setData(result);
+        console.log(result);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+  
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          await fetch('/api/example');
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+  
+      fetchData();
+    }, []);
+
+
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
@@ -239,3 +270,5 @@ const rows = [
   { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
 ];
 export default Search;
+
+
