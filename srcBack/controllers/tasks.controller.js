@@ -60,11 +60,11 @@ const updateTablaEvaluacion = async (req, res) => {
 }
 
 const updateTablaResumen = async (req, res) => {
-    const { id_evaluacion } = req.params;
+    const { id_resumen } = req.params;
     const { resumen_perfil} = req.body;
 
-    const result = await db.query("UPDATE resumen SET año = $1 WHERE id_resumen = $2 RETURNING *", 
-    [resumen_perfil, id_evaluacion]);
+    const result = await db.query("UPDATE resumen SET resumen_perfil = $1 WHERE id_resumen = $2 RETURNING *", 
+    [resumen_perfil, id_resumen]);
 
     console.log(result)
 
@@ -75,7 +75,7 @@ const updateTablaTrayectoria = async (req, res) => {
     const { id_trayectoria } = req.params;
     const { empresa} = req.body;
 
-    const result = await db.query("UPDATE trayectoria SET empresa = $1 WHERE id_resumen = $2 RETURNING *", 
+    const result = await db.query("UPDATE trayectoria SET empresa = $1 WHERE id_trayectoria = $2 RETURNING *", 
     [empresa, id_trayectoria]);
 
     console.log(result)
