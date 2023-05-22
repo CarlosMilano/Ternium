@@ -5,6 +5,8 @@ import Edit from "@mui/icons-material/Edit";
 import { FormEventHandler, MouseEvent, MouseEventHandler, ReactNode } from "react";
 import { TextButton } from "../themed/ThemedButtons";
 
+export type EditEventHandler = (event: MouseEvent<HTMLButtonElement>, index: number) => void;
+
 interface EditSectionProps {
     /**
      * An index identifying the section.
@@ -20,7 +22,7 @@ interface EditSectionProps {
      * @param event - A mouse event passed down from OnClick.
      * @param index - The index value of the section.
      */
-    onEdit: (event: MouseEvent<HTMLButtonElement>, index: number) => void;
+    onEdit: EditEventHandler;
     /**
      * A handler function for clicking the cancel button.
      * Passes down the mouse event.
