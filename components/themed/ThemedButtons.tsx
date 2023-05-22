@@ -1,9 +1,9 @@
 import Button, { ButtonProps } from "@mui/material/Button";
-import Popover from "@mui/material/Popover";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
+import Popover from "@mui/material/Popover";
 import { styled } from "@mui/material/styles";
 import { useState, useEffect, MouseEvent } from "react";
 
@@ -43,7 +43,6 @@ export interface DropdownButtonProps extends ButtonProps {
      *
      * @param e - A mouse event passed down from onClick.
      * @param option - The text value of the option selected.
-     * @returns
      */
     onClickOption: (e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>, option: string) => void;
 }
