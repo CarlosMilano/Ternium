@@ -47,19 +47,6 @@ function Search() {
     fetchData();
   }, []);
   
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          await fetch('/api/example');
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        }
-      };
-  
-      fetchData();
-    }, []);
-
-
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
