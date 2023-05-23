@@ -32,17 +32,17 @@ function Search() {
 
   const [data, setData] = useState([]);
 
+  const fetchData = async () => {
+    try {
+      const response = await fetch('/api/getTablaEmpleado');
+      const result = await response.json();
+      setData(result);
+      console.log(result);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('/api/example');
-        const result = await response.json();
-        setData(result);
-        console.log(result);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
 
     fetchData();
   }, []);
@@ -56,6 +56,7 @@ function Search() {
   const handleClose = () => {
     setOpen(false);
   };
+
 
   return (
     <Box sx={{ bgcolor: "white", height: "100vh", width: "100%" }}>

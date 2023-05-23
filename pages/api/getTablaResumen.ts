@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getEmployeesData } from './services/getficha_api';
+import { getResumenData } from './services/getTablaResumen';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const result = await getEmployeesData();
+    const result = await getResumenData();
     res.status(200).json(result);
   } catch (error) {
     console.error('Error fetching data:', error);
