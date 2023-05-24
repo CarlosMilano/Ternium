@@ -34,6 +34,10 @@ interface EditSectionProps {
      */
     onSubmit: FormEventHandler<HTMLFormElement>;
     /**
+     * Forces the edit button to be disabled.
+     */
+    disabled?: boolean;
+    /**
      * The content inside the section.
      */
     children: ReactNode;
@@ -51,17 +55,18 @@ const EditSection: React.FC<EditSectionProps> = ({
     onEdit,
     onCancel,
     onSubmit,
+    disabled,
     children,
 }): JSX.Element => {
     const isInEditMode: boolean = index === currentIndex;
-    const isEnabled: boolean = currentIndex === null;
+    const isEnabled: boolean = currentIndex === null && !disabled;
 
     if (isInEditMode) {
         // Returns the content with accept and cancel buttons, at the bottom.
         return (
             <form onSubmit={onSubmit}>
                 {children}
-                <Stack>
+                <Stack direction="row" gap={2} justifyContent="flex-end" mt={2}>
                     <TextButton variant="text" onClick={onCancel}>
                         Cancelar
                     </TextButton>
