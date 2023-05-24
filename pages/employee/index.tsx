@@ -125,11 +125,11 @@ async function fakeFetch(path: "empleado" | "comentarios" | "resumen" | "evaluac
  */
 const EmployeePage: React.FC = (): JSX.Element => {
     // The data from the different tables in the db.
-    const [dataEmpleado, updateDataEmpleado, setDataEmpleado] = useObjectState<TableEmpleado>(null);
-    const [dataComentarios, updateDataComentarios, setDataComentarios] = useObjectState<DataComentarios>(null);
-    const [dataResumen, updateDataResumen, setDataResumen] = useObjectState<DataResumen>(null);
-    const [dataEvaluacion, updateDataEvaluacion, setDataEvaluacion] = useObjectState<DataEvaluacion>(null);
-    const [dataTrayectoria, updateDataTrayectoria, setDataTrayectoria] = useObjectState<DataTrayectoria>(null);
+    const [dataEmpleado, updateDataEmpleado, setDataEmpleado] = useObjectState<TableEmpleado | null>(null);
+    const [dataComentarios, updateDataComentarios, setDataComentarios] = useObjectState<DataComentarios | null>(null);
+    const [dataResumen, updateDataResumen, setDataResumen] = useObjectState<DataResumen | null>(null);
+    const [dataEvaluacion, updateDataEvaluacion, setDataEvaluacion] = useObjectState<DataEvaluacion | null>(null);
+    const [dataTrayectoria, updateDataTrayectoria, setDataTrayectoria] = useObjectState<DataTrayectoria | null>(null);
     // The index of the section being currently edited.
     const [editSectionIndex, setEditSectionIndex] = useState<number | null>(null);
     // The indexes of the selected tabs.
