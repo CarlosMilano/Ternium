@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getEvaluacionData } from './services/getTablaEvaluacion';
+import getEvaluacionData from './services/getTablaEvaluacion';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

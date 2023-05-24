@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getTrayectoriaData } from './services/getTablaTrayectoria';
+import getTrayectoriaData from './services/getTablaTrayectoria';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
