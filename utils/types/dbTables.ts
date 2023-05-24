@@ -1,5 +1,5 @@
 export type TableEmpleado = {
-    id_empleado?: string;
+    id_empleado: string;
     nombre?: string;
     edad?: number;
     antiguedad?: number;
