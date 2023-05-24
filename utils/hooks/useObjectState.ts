@@ -1,45 +1,39 @@
 import { useState, Dispatch, SetStateAction } from "react";
 
-export type DispatchObject<T> = (newValue: T) => void;
-export type SetPropertyAction<T> = (name: string, newValue: any) => void;
-export type DispatchPropertyParam<T> = any | ((prev: T) => any);
-
-export type UpdateStateAction<T> = any;
-export type DispatchProperty<T> = (path: string, value: UpdateStateAction<T>) => void;
+// Type for the function that dispatches a data's property.
+export type DispatchProperty<T> = (path: string, value: any) => void;
 
 /**
  *
  * @param initialValue - The initial object of the state.
  * @returns
- *      object - The state of the object.
- *      DispatchProperty - A function that updates a specific value in the data.
- *      DispatchObject - A function that sets the entire data.
+ *      data - The state of the object.
+ *      updateProperty - A function that updates a specific value in the data.
+ *      setData - A function that sets the entire data.
  */
-function useObjectState<T extends object>(
-    initialValue: T | null
-): [T | null, DispatchProperty<T>, Dispatch<SetStateAction<T | null>>] {
-    const [data, setData]: [T | null, Dispatch<SetStateAction<T | null>>] = useState<T | null>(initialValue);
+function useObjectState<T extends object | null>(
+    initialValue: T
+): [T, DispatchProperty<T>, Dispatch<SetStateAction<T>>] {
+    const [data, setData]: [T, Dispatch<SetStateAction<T>>] = useState<T>(initialValue);
 
     /**
      * Updates a specific property inside the data, without modifying the rest.
-     * @param name - The string name of the property-
-     * @param newValue
-     *      any - The updated value of the property.
-     *      (:object) => any - An arrow function that receives the current data, and returns an updated value.
+     * @param name - The string path to the desired property.
+     * @param newValue - The updated value of the property.
      */
     const updateProperty: DispatchProperty<T> = (path, newValue) => {
         if (path.length === 0) return;
         const keys: string[] = path.split(".");
         const lastKey: string = keys.pop() || "";
 
-        setData((prev: T | null) => {
+        setData((prev: T) => {
             if (prev === null) return prev;
             const newState: T = { ...prev };
-            let currentObject: object = newState;
+            let currentObject: { [key: string]: any } = newState;
 
             keys.forEach((key: string) => {
                 if (!currentObject.hasOwnProperty(key)) throw Error(`Key '${key}' not found.`);
-                const value: any = currentObject[key];
+                const value = currentObject[key];
                 if (typeof value !== "object" || value === null) {
                     throw Error(`Key '${key}' not an object.`);
                 }
