@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { auth } from "@/config/environment/firebase";
 import { themeColors } from "@/config/theme";
+import { useUser } from "@/providers/user";
 import {
   ExitToApp,
   FilterAltOutlined,
@@ -7,6 +8,7 @@ import {
   SearchOutlined,
 } from "@mui/icons-material";
 import {
+  Alert,
   Box,
   Button,
   Chip,
@@ -18,49 +20,20 @@ import {
   FilledInput,
   FormControl,
   InputAdornment,
-  InputLabel,
-  TextField,
-  Typography,
+  Snackbar,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
+import { signOut } from "firebase/auth";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
+import React, { useState } from "react";
 import terniumLogo from "../../public/assets/imgs/ternium_color.png";
 
 function Search() {
-
-  const [data, setData] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('/api/example');
-        const result = await response.json();
-        setData(result);
-        console.log(result);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
-  
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          await fetch('/api/example');
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        }
-      };
-  
-      fetchData();
-    }, []);
-
-
   const [open, setOpen] = useState(false);
+  const [openSnack, setOpenSnack] = useState(false);
+  const { setIsLogged } = useUser();
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -70,8 +43,48 @@ function Search() {
     setOpen(false);
   };
 
+  const handleClickSnack = () => {
+    setOpenSnack(true);
+  };
+
+  const handleCloseSnack = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpenSnack(false);
+  };
+
+  const handleSignOut = () => {
+    signOut(auth)
+      .then(() => {
+        setIsLogged(false);
+      })
+      .catch((error) => {
+        handleClickSnack;
+      });
+  };
+
   return (
     <Box sx={{ bgcolor: "white", height: "100vh", width: "100%" }}>
+      {/* <button onClick={handleClickSnack}>Hola</button> */}
+      <Snackbar
+        open={openSnack}
+        autoHideDuration={6000}
+        onClose={handleCloseSnack}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleCloseSnack}
+          severity='error'
+          sx={{ width: "100%" }}
+        >
+          Ocurrio un error!
+        </Alert>
+      </Snackbar>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -131,6 +144,7 @@ function Search() {
             variant='text'
             startIcon={<ExitToApp />}
             sx={{ color: themeColors.grisAceroTernium }}
+            onClick={handleSignOut}
           >
             Cerrar Sesion
           </Button>
@@ -270,5 +284,3 @@ const rows = [
   { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
 ];
 export default Search;
-
-

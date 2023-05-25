@@ -1,13 +1,24 @@
 import styled from "@emotion/styled";
-import { Box, Button, InputAdornment, TextField } from "@mui/material";
+import {
+  Alert,
+  AlertTitle,
+  Box,
+  Button,
+  InputAdornment,
+  TextField,
+} from "@mui/material";
 import { Stack } from "@mui/system";
 import Head from "next/head";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import terniumLogo from "../../public/assets/imgs/ternium_logo_white.png";
 import { themeColors } from "../../config/theme";
 import { LockOutlined, MailOutline } from "@mui/icons-material";
 import Link from "next/link";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../config/environment/firebase";
+import { useRouter } from "next/router";
+import { useUser } from "@/providers/user";
 
 const LoginTextField = styled(TextField)(({ theme }) => ({
   width: "clamp(35%, 320px, 80%)",
@@ -66,11 +77,30 @@ const LoginButton = styled(Button)(({ theme }) => ({
 }));
 
 const Login = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [wrongPassword, setWrongPassword] = useState(false);
+  const { setIsLogged } = useUser();
+
+  const router = useRouter();
 
   const handleOnSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
+  };
+
+  console.log("env", process.env.HOLA);
+
+  const handleLogin = () => {
+    signInWithEmailAndPassword(auth, email, password)
+      .then(() => {
+        setIsLogged(true);
+        console.log("aqui se cambia el login, HAndle logn");
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        setWrongPassword(true);
+      });
   };
 
   return (
@@ -108,8 +138,8 @@ const Login = () => {
                     </InputAdornment>
                   ),
                 }}
-                value={username}
-                onChange={(e) => setUsername(e.target.value.trim())}
+                value={email}
+                onChange={(e) => setEmail(e.target.value.trim())}
               />
               <LoginTextField
                 id='password'
@@ -129,11 +159,16 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value.trim())}
               />
             </Stack>
-            <Link href='/search'>
-              <LoginButton variant='outlined' type='submit'>
-                Entrar
-              </LoginButton>
-            </Link>
+            {wrongPassword && (
+              <Alert severity='error'>
+                <AlertTitle>Error</AlertTitle>
+                Usuario y/o contraseñas incorrectas{" "}
+                <strong>Vuelve a intentar!</strong>
+              </Alert>
+            )}
+            <LoginButton onClick={handleLogin} variant='outlined' type='submit'>
+              Entrar
+            </LoginButton>
           </Stack>
         </form>
       </Stack>
