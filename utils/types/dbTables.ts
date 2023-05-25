@@ -11,28 +11,28 @@ export type TableEmpleado = {
     pc_cat?: string;
 };
 export type TableTrayectoria = {
-    id_trayectoria?: string;
+    id_trayectoria: number;
     empresa?: string;
     puesto?: string;
-    id_empleado?: string;
+    id_empleado: number;
 };
 export type TableComentarios = {
-    id_comentario?: string;
+    id_comentario: number;
     nota?: number;
     promedio_notas?: number;
     comentario?: string;
-    id_empleado?: string;
+    id_empleado: number;
 };
 export type TableResumen = {
-    id_resumen?: string;
+    id_resumen: number;
     resumen_perfil?: string;
-    id_empleado?: string;
+    id_empleado: number;
 };
 export type TableEvaluacion = {
-    id_evaluacion?: string;
-    anio?: number;
+    id_evaluacion: number;
+    año?: number;
     performance?: number;
     potencial?: number;
     curva?: string;
-    id_empleado?: string;
+    id_empleado: number;
 };
