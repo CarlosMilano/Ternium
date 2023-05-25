@@ -41,7 +41,7 @@ function useObjectState<T extends object | null>(
             });
 
             if (!currentObject.hasOwnProperty(lastKey)) {
-                throw Error(`Key '${lastKey}' not found.`);
+                console.warn(`Key '${lastKey}' not found, but set anyway.`);
             }
             currentObject[lastKey] = newValue;
 
