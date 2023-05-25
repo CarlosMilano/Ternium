@@ -13,7 +13,7 @@ import { useState, useEffect, MouseEvent } from "react";
  */
 export const OutlinedButton = styled(Button)(({ theme }) => {
     return {
-        borderColor: "var(--ternium-rojo)",
+        borderColor: theme.colors.rojoTernium,
         paddingBlock: "0.5rem",
     };
 });
@@ -24,7 +24,7 @@ export const OutlinedButton = styled(Button)(({ theme }) => {
  */
 export const TextButton = styled(Button)(({ theme }) => {
     return {
-        color: "var(--ternium-gris-acero)",
+        color: theme.colors.grisAceroTernium,
     };
 });
 
@@ -49,7 +49,7 @@ export interface DropdownButtonProps extends ButtonProps {
 }
 /**
  * DropdownButton component.
- * 
+ *
  * A Button component that displays a dropdown list.
  */
 export const DropdownButton: React.FC<DropdownButtonProps> = ({
