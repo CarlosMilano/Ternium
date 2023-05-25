@@ -18,7 +18,7 @@ function useObjectState<T extends object | null>(
 
     /**
      * Updates a specific property inside the data, without modifying the rest.
-     * @param name - The string path to the desired property.
+     * @param path - The string path to the desired property.
      * @param newValue - The updated value of the property.
      */
     const updateProperty: DispatchProperty<T> = (path, newValue) => {
@@ -45,7 +45,8 @@ function useObjectState<T extends object | null>(
             }
             currentObject[lastKey] = newValue;
 
-            return newState;
+            // Returns object as an array, if the original value was an array.
+            return Array.isArray(prev) ? (Object.values(newState) as T) : newState;
         });
     };
 
