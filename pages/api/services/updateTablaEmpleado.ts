@@ -1,21 +1,21 @@
-import pool from '../dbConfig';
-import { QueryResult } from 'pg';
+import pool from "../dbConfig";
+import { QueryResult } from "pg";
 
 export async function updateTablaEmpleados(
-  nombre: string | null,
-  edad: number | null,
-  antiguedad: number | null,
-  universidad: string | null,
-  area_manager: string | null,
-  direccion: string | null,
-  puesto: string | null,
-  pc_cat: string | null,
-  id_empleado: number
+    nombre: string | null,
+    edad: number | null,
+    antiguedad: number | null,
+    universidad: string | null,
+    area_manager: string | null,
+    direccion: string | null,
+    puesto: string | null,
+    pc_cat: string | null,
+    id_empleado: number
 ): Promise<QueryResult> {
-  const client = await pool.connect();
+    const client = await pool.connect();
 
-  try {
-    const updateQuery = `
+    try {
+        const updateQuery = `
       UPDATE empleado
       SET
         nombre = COALESCE($1, nombre),
@@ -29,21 +29,11 @@ export async function updateTablaEmpleados(
       WHERE id_empleado = $9
     `;
 
-    const values = [
-      nombre,
-      edad,
-      antiguedad,
-      universidad,
-      area_manager,
-      direccion,
-      puesto,
-      pc_cat,
-      id_empleado,
-    ];
+        const values = [nombre, edad, antiguedad, universidad, area_manager, direccion, puesto, pc_cat, id_empleado];
 
-    const result: QueryResult = await client.query(updateQuery, values);
-    return result;
-  } finally {
-    client.release();
-  }
+        const result: QueryResult = await client.query(updateQuery, values);
+        return result;
+    } finally {
+        client.release();
+    }
 }
