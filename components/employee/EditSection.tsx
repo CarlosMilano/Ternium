@@ -38,6 +38,10 @@ interface EditSectionProps {
      */
     disabled?: boolean;
     /**
+     * Forces the save button to be disabled.
+     */
+    disableSave?: boolean;
+    /**
      * The content inside the section.
      */
     children: ReactNode;
@@ -56,6 +60,7 @@ const EditSection: React.FC<EditSectionProps> = ({
     onCancel,
     onSubmit,
     disabled,
+    disableSave,
     children,
 }): JSX.Element => {
     const isInEditMode: boolean = index === currentIndex;
@@ -70,7 +75,7 @@ const EditSection: React.FC<EditSectionProps> = ({
                     <TextButton variant="text" onClick={onCancel}>
                         Cancelar
                     </TextButton>
-                    <Button variant="contained" type="submit">
+                    <Button variant="contained" type="submit" disabled={disableSave}>
                         Guardar
                     </Button>
                 </Stack>
