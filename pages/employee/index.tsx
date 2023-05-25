@@ -31,6 +31,11 @@ import {
 import LabelledField from "@/components/employee/LabelledField";
 import TextField from "@mui/material/TextField";
 import { GetEmpleadoRequestBody } from "../api/getTablaEmpleado";
+import { GetComentariosRequestBody } from "../api/getTablaComentarios";
+import { GetResumenRequestBody } from "../api/getTablaResumen";
+import { GetEvaluacionRequestBody } from "../api/getTablaEvaluacion";
+import deepClone from "@/utils/deepClone";
+import { GetTrayectoriaRequestBody } from "../api/getTablaTrayectoria";
 
 type AllData = {
     dataEmpleado: TableEmpleado | null;
@@ -39,80 +44,6 @@ type AllData = {
     dataEvaluacion: TableEvaluacion[] | null;
     dataTrayectoria: TableTrayectoria[] | null;
 };
-async function fakeFetch(path: "empleado" | "comentarios" | "resumen" | "evaluacion" | "trayectoria"): Promise<object> {
-    const empleado: TableEmpleado = {
-        id_empleado: 1,
-        nombre: "Jorge Claudio González Becerril",
-        edad: 21,
-        antiguedad: 1,
-        estudios: "0",
-        universidad: "ITESM",
-        area_manager: "Cocina",
-        direccion: "Manejo regional",
-        puesto: "Cocinero de Pizza",
-        pc_cat: "51 - 51",
-    };
-    const comentarios: TableComentarios[] = [
-        {
-            id_comentario: "0",
-            nota: 5,
-            comentario:
-                "Muy bien hecho, eres el mejor empleado que he tenido en toda la vida. Lo recomiendo para hacer " +
-                "trabajos manuales y sucios. Volvería a contratarlo.",
-        },
-        {
-            id_comentario: "1",
-            nota: 3,
-            comentario: "No pienso que volvería a ser una opción.",
-        },
-    ];
-    const resumen: TableResumen[] = [
-        {
-            id_resumen: "0",
-            resumen_perfil: "Cursó la materia de besarse a más de diez perros.",
-        },
-        {
-            id_resumen: "1",
-            resumen_perfil: "Atacó a la reina.",
-        },
-        {
-            id_resumen: "2",
-            resumen_perfil: "No tengo comentarios sobre este empleado.",
-        },
-    ];
-    const evaluacion: TableEvaluacion[] = [
-        { id_evaluacion: "0", performance: 5, anio: 2023, potencial: 5, curva: "TX DIMA C1" },
-        { id_evaluacion: "1", performance: 4, anio: 2022, potencial: 4, curva: "TX DIMA C1" },
-        { id_evaluacion: "2", performance: 5, anio: 2021, potencial: 5, curva: "TX DIMA C1" },
-    ];
-    const trayectoria: TableTrayectoria[] = [
-        { id_trayectoria: "0", empresa: "Ternium", puesto: "Ingeniero Civil" },
-        { id_trayectoria: "1", empresa: "Lyft", puesto: "Superintendente" },
-    ];
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            switch (path) {
-                case "empleado":
-                    resolve(empleado);
-                    break;
-                case "comentarios":
-                    resolve(comentarios);
-                    break;
-                case "resumen":
-                    resolve(resumen);
-                    break;
-                case "evaluacion":
-                    resolve(evaluacion);
-                    break;
-                case "trayectoria":
-                    resolve(trayectoria);
-                    break;
-                default:
-                    resolve({});
-            }
-        }, 500);
-    });
-}
 
 /**
  * EmployeePage component.
@@ -164,10 +95,9 @@ const EmployeePage: React.FC = (): JSX.Element => {
                     body: JSON.stringify(bodyEmpleado),
                 });
                 if (res.ok) {
-                    const dataEmpleado: TableEmpleado = await res.json();
-                    setDataEmpleado(dataEmpleado);
-                    updateFetchedData("dataEmpleado", dataEmpleado);
-                    console.log(dataEmpleado);
+                    const empleado: TableEmpleado = await res.json();
+                    setDataEmpleado(empleado);
+                    updateFetchedData("dataEmpleado", empleado);
                 } else {
                     const error: { error: string } = await res.json();
                     console.error(error.error);
@@ -175,37 +105,123 @@ const EmployeePage: React.FC = (): JSX.Element => {
             } catch (err) {
                 console.error("Error fetching data for Empleado");
             }
-            // setDataEmpleado((await fakeFetch("empleado")) as TableEmpleado);
-            setDataComentarios((await fakeFetch("comentarios")) as TableComentarios[]);
-            setDataResumen((await fakeFetch("resumen")) as TableResumen[]);
-            setDataEvaluacion((await fakeFetch("evaluacion")) as TableEvaluacion[]);
-            setDataTrayectoria((await fakeFetch("trayectoria")) as TableTrayectoria[]);
+            // Fetch data for Comentarios.
+            try {
+                const bodyComentarios: GetComentariosRequestBody = {
+                    id_empleado: idEmpleado,
+                };
+                const res = await fetch("/api/getTablaComentarios", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(bodyComentarios),
+                });
+                if (res.ok) {
+                    const comentarios: TableComentarios[] = await res.json();
+                    setDataComentarios(comentarios);
+                    updateFetchedData("dataComentarios", deepClone(comentarios));
+                } else {
+                    const error: { error: string } = await res.json();
+                    console.error(error.error);
+                }
+            } catch (err) {
+                console.error("Error fetching data for Comentarios");
+            }
+            // Fetch data for Resumen.
+            try {
+                const bodyResumen: GetResumenRequestBody = {
+                    id_empleado: idEmpleado,
+                };
+                const res = await fetch("/api/getTablaResumen", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(bodyResumen),
+                });
+                if (res.ok) {
+                    const resumenes: TableResumen[] = await res.json();
+                    setDataResumen(resumenes);
+                    updateFetchedData("dataResumen", deepClone(resumenes));
+                } else {
+                    const error: { error: string } = await res.json();
+                    console.error(error.error);
+                }
+            } catch (err) {
+                console.error("Error fetching data for Resumen");
+            }
+            // Fetch data for Evaluacion.
+            try {
+                const bodyEvaluacion: GetEvaluacionRequestBody = {
+                    id_empleado: idEmpleado,
+                };
+                const res = await fetch("/api/getTablaEvaluacion", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(bodyEvaluacion),
+                });
+                if (res.ok) {
+                    const evaluaciones: TableEvaluacion[] = await res.json();
+                    setDataEvaluacion(evaluaciones);
+                    updateFetchedData("dataEvaluacion", deepClone(evaluaciones));
+                } else {
+                    const error: { error: string } = await res.json();
+                    console.error(error.error);
+                }
+            } catch (err) {
+                console.error("Error fetching data for Evaluacion");
+            }
+            // Fetch data for Trayectoria.
+            try {
+                const bodyTrayectoria: GetTrayectoriaRequestBody = {
+                    id_empleado: idEmpleado,
+                };
+                const res = await fetch("/api/getTablaTrayectoria", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(bodyTrayectoria),
+                });
+                if (res.ok) {
+                    const trayectorias: TableTrayectoria[] = await res.json();
+                    setDataTrayectoria(trayectorias);
+                    updateFetchedData("dataTrayectoria", deepClone(trayectorias));
+                } else {
+                    const error: { error: string } = await res.json();
+                    console.error(error.error);
+                }
+            } catch (err) {
+                console.error("Error fetching data for Trayectoria");
+            }
         };
         fetchData();
     }, []);
 
+    function resetData(setDataFunction: Function, value: any): void {
+        setDataFunction(value ? deepClone(value) : value);
+    }
+    function resetProperty(updateDataFunction: Function, path: string, value: any): void {
+        updateDataFunction(path, value ? deepClone(value) : value);
+    }
+
     const handleOnEdit: EditEventHandler = (_, index) => setEditSectionIndex(index);
-    const handleOnSubmit: FormEventHandler<HTMLFormElement> = () => {};
     const handleOnCancel: (
         event: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>,
         type: "empleado" | "comentarios" | "resumen" | "evaluacion" | "trayectoria"
     ) => void = (e, type) => {
         setEditSectionIndex(null);
+
         switch (type) {
             case "empleado":
-                setDataEmpleado(fetchedData.dataEmpleado);
+                resetData(setDataEmpleado, fetchedData.dataEmpleado);
                 break;
             case "comentarios":
-                setDataComentarios(fetchedData.dataComentarios);
+                resetData(setDataComentarios, fetchedData.dataComentarios);
                 break;
             case "resumen":
-                setDataResumen(fetchedData.dataResumen);
+                resetData(setDataResumen, fetchedData.dataResumen);
                 break;
             case "evaluacion":
-                setDataEvaluacion(fetchedData.dataEvaluacion);
+                resetData(setDataEvaluacion, fetchedData.dataEvaluacion);
                 break;
             case "trayectoria":
-                setDataTrayectoria(fetchedData.dataTrayectoria);
+                resetData(setDataTrayectoria, fetchedData.dataTrayectoria);
                 break;
             default:
                 throw Error("type not found.");
@@ -214,7 +230,6 @@ const EmployeePage: React.FC = (): JSX.Element => {
     const handleOnSubmitEmpleado: FormEventHandler<HTMLFormElement> = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsUpdatingData(true);
-        console.log("Updating data...");
         try {
             const res = await fetch("/api/updateTablaEmpleado", {
                 method: "PUT",
@@ -228,14 +243,131 @@ const EmployeePage: React.FC = (): JSX.Element => {
                 updateFetchedData("dataEmpleado", dataEmpleado);
             } else {
                 console.error("Error updating data for Empleado: ", res.statusText);
-                setDataEmpleado(fetchedData.dataEmpleado);
+                resetData(setDataEmpleado, fetchedData.dataEmpleado);
             }
         } catch (err) {
             console.error("Error updating data for Empleado");
+        } finally {
+            setEditSectionIndex(null);
+            setIsUpdatingData(false);
         }
-        console.log("Updated ended!");
-        setEditSectionIndex(null);
-        setIsUpdatingData(false);
+    };
+    const handleOnSubmitComentarios: FormEventHandler<HTMLFormElement> = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setIsUpdatingData(true);
+        dataComentarios?.forEach(async (comentario: TableComentarios, index: number) => {
+            try {
+                const res = await fetch("/api/updateTablaComentarios", {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(comentario),
+                });
+                if (res.ok) {
+                    const result = await res.json();
+                    resetProperty(updateFetchedData, `dataComentarios.${index}`, comentario);
+                    // updateFetchedData(`dataComentarios.${index}`, comentario);
+                } else {
+                    console.error("Error updating data for Comentarios: ", res.statusText);
+                    resetProperty(updateDataComentarios, `${index}`, fetchedData.dataComentarios?.at(index));
+                    // const previousData: TableComentarios | null = fetchedData.dataComentarios?.at(index) || null;
+                    // updateDataComentarios(`${index}`, previousData);
+                }
+            } catch (err) {
+                console.error("Error updating data for Comentarios");
+            } finally {
+                setEditSectionIndex(null);
+                setIsUpdatingData(false);
+            }
+        });
+    };
+    const handleOnSubmitResumen: FormEventHandler<HTMLFormElement> = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setIsUpdatingData(true);
+        dataResumen?.forEach(async (resumen: TableResumen, index: number) => {
+            try {
+                const res = await fetch("/api/updateTablaResumen", {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(resumen),
+                });
+                if (res.ok) {
+                    const result = await res.json();
+                    resetProperty(updateFetchedData, `dataResumen.${index}`, resumen);
+                    // updateFetchedData(`dataResumen.${index}`, resumen);
+                } else {
+                    console.error("Error updating data for Resumen: ", res.statusText);
+                    resetProperty(updateDataResumen, `${index}`, fetchedData.dataResumen?.at(index));
+                    // const previousData: TableResumen | null = fetchedData.dataResumen?.at(index) || null;
+                    // updateDataResumen(`${index}`, previousData);
+                }
+            } catch (err) {
+                console.error("Error updating data for Resumen");
+            } finally {
+                setEditSectionIndex(null);
+                setIsUpdatingData(false);
+            }
+        });
+    };
+    const handleOnSubmitEvaluacion: FormEventHandler<HTMLFormElement> = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setIsUpdatingData(true);
+        dataEvaluacion?.forEach(async (evaluacion: TableEvaluacion, index: number) => {
+            try {
+                const res = await fetch("/api/updateTablaEvaluacion", {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(evaluacion),
+                });
+                if (res.ok) {
+                    const result = await res.json();
+                    resetProperty(updateFetchedData, `dataEvaluacion.${index}`, evaluacion);
+                    // updateFetchedData(`dataEvaluacion.${index}`, evaluacion);
+                } else {
+                    console.error("Error updating data for Evaluacion: ", res.statusText);
+                    resetProperty(updateDataEvaluacion, `${index}`, fetchedData.dataEvaluacion?.at(index));
+                    // const previousData: TableEvaluacion | null = fetchedData.dataEvaluacion?.at(index) || null;
+                    // updateDataEvaluacion(`${index}`, previousData);
+                }
+            } catch (err) {
+                console.error("Error updating data for Evaluacion");
+            } finally {
+                setEditSectionIndex(null);
+                setIsUpdatingData(false);
+            }
+        });
+    };
+    const handleOnSubmitTrayectoria: FormEventHandler<HTMLFormElement> = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setIsUpdatingData(true);
+        dataTrayectoria?.forEach(async (trayectoria: TableTrayectoria, index: number) => {
+            try {
+                const res = await fetch("/api/updateTablaTrayectoria", {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(trayectoria),
+                });
+                if (res.ok) {
+                    const result = await res.json();
+                    resetProperty(updateFetchedData, `dataTrayectoria.${index}`, trayectoria);
+                } else {
+                    console.error("Error updating data for Trayectoria: ", res.statusText);
+                    resetProperty(updateDataTrayectoria, `${index}`, fetchedData.dataTrayectoria?.at(index));
+                }
+            } catch (err) {
+                console.error("Error updating data for Trayectoria");
+            } finally {
+                setEditSectionIndex(null);
+                setIsUpdatingData(false);
+            }
+        });
     };
 
     // Generates a color for the employee's avatar, based on their name.
@@ -447,7 +579,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                         index={1}
                                         currentIndex={editSectionIndex}
                                         onEdit={handleOnEdit}
-                                        onSubmit={handleOnSubmit}
+                                        onSubmit={handleOnSubmitComentarios}
                                         onCancel={(e) => handleOnCancel(e, "comentarios")}
                                         disabled={dataComentarios === null}
                                         disableSave={isUpdatingData}
@@ -486,14 +618,14 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                                 };
                                                                 const inputElementNota: JSX.Element = (
                                                                     <TextField
-                                                                        value={nota}
+                                                                        value={nota || ""}
                                                                         onChange={onChangeNota}
                                                                         size="small"
                                                                     />
                                                                 );
                                                                 const inputElementComentario: JSX.Element = (
                                                                     <TextField
-                                                                        value={comentario}
+                                                                        value={comentario || ""}
                                                                         onChange={onChangeComentario}
                                                                         size="small"
                                                                         fullWidth
@@ -576,7 +708,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                         index={2}
                                         currentIndex={editSectionIndex}
                                         onEdit={handleOnEdit}
-                                        onSubmit={handleOnSubmit}
+                                        onSubmit={handleOnSubmitResumen}
                                         onCancel={(e) => handleOnCancel(e, "resumen")}
                                         disabled={dataResumen === null}
                                         disableSave={isUpdatingData}
@@ -606,7 +738,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                                 };
                                                                 const inputElement: JSX.Element = (
                                                                     <TextField
-                                                                        value={resumen_perfil}
+                                                                        value={resumen_perfil || ""}
                                                                         onChange={onChange}
                                                                         size="small"
                                                                         fullWidth
@@ -676,7 +808,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                         index={3}
                                         currentIndex={editSectionIndex}
                                         onEdit={handleOnEdit}
-                                        onSubmit={handleOnSubmit}
+                                        onSubmit={handleOnSubmitEvaluacion}
                                         onCancel={(e) => handleOnCancel(e, "evaluacion")}
                                         disabled={dataEvaluacion === null}
                                         disableSave={isUpdatingData}
@@ -687,7 +819,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                     {
                                                         id_evaluacion,
                                                         performance,
-                                                        anio,
+                                                        año,
                                                         potencial,
                                                         curva,
                                                     }: TableEvaluacion,
@@ -749,7 +881,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                                         width="100%"
                                                                         color="grey"
                                                                     >
-                                                                        {anio}
+                                                                        {año}
                                                                     </Typography>
                                                                     {/* Potencial */}
                                                                     <LabelledField
@@ -797,7 +929,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                         index={4}
                                         currentIndex={editSectionIndex}
                                         onEdit={handleOnEdit}
-                                        onSubmit={handleOnSubmit}
+                                        onSubmit={handleOnSubmitTrayectoria}
                                         onCancel={(e) => handleOnCancel(e, "trayectoria")}
                                         disabled={dataTrayectoria === null}
                                         disableSave={isUpdatingData}
