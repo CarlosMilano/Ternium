@@ -36,6 +36,7 @@ import { GetResumenRequestBody } from "../api/getTablaResumen";
 import { GetEvaluacionRequestBody } from "../api/getTablaEvaluacion";
 import deepClone from "@/utils/deepClone";
 import { GetTrayectoriaRequestBody } from "../api/getTablaTrayectoria";
+import { useRouter } from "next/router";
 
 type AllData = {
     dataEmpleado: TableEmpleado | null;
@@ -79,11 +80,11 @@ const EmployeePage: React.FC = (): JSX.Element => {
     // Determines if publish buttons should be disabled.
     const [isUpdatingData, setIsUpdatingData] = useState<boolean>(false);
 
-    const idEmpleado: number = 1;
+    const router = useRouter();
 
     // Data fetching.
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchData = async (idEmpleado: number) => {
             // Fetch data for Empleado.
             try {
                 const bodyEmpleado: GetEmpleadoRequestBody = {
@@ -190,7 +191,15 @@ const EmployeePage: React.FC = (): JSX.Element => {
                 console.error("Error fetching data for Trayectoria");
             }
         };
-        fetchData();
+        // Gets the id of the employee from the url.
+        const { id } = router.query;
+        // Early return if no id is specified.
+        if (id === undefined) {
+            router.push("/search");
+            return;
+        }
+        const idEmpleado: number = Number(id);
+        fetchData(idEmpleado);
     }, []);
 
     function resetData(setDataFunction: Function, value: any): void {
@@ -852,7 +861,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                                             mt: 2,
                                                                         }}
                                                                     >
-                                                                        {performance}
+                                                                        {performance ? (performance % 3) + 2 : 4}
                                                                     </Avatar>
                                                                     <div
                                                                         hidden={isLast}
@@ -892,7 +901,9 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                                         onChange={onChangePotencial}
                                                                     >
                                                                         <Typography variant="body1" component="p">
-                                                                            {potencial}
+                                                                            {potencial && potencial > 3
+                                                                                ? "AP (MT)"
+                                                                                : "PROM (M)"}
                                                                         </Typography>
                                                                     </LabelledField>
                                                                     {/* Curva */}

@@ -1,34 +1,53 @@
-import { auth } from "@/config/environment/firebase";
-import { themeColors } from "@/config/theme";
-import { useUser } from "@/providers/user";
-import { ExitToApp, FilterAltOutlined, PictureAsPdf, SearchOutlined } from "@mui/icons-material";
-import {
-    Alert,
-    Box,
-    Button,
-    Chip,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    FilledInput,
-    FormControl,
-    InputAdornment,
-    Snackbar,
-} from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
-import { signOut } from "firebase/auth";
+import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import ExitToApp from "@mui/icons-material/ExitToApp";
+import FilterAltOutlined from "@mui/icons-material/FilterAltOutlined";
+import FilledInput from "@mui/material/FilledInput";
+import FormControl from "@mui/material/FormControl";
+import InputAdornment from "@mui/material/InputAdornment";
+import PictureAsPdf from "@mui/icons-material/PictureAsPdf";
+import SearchOutlined from "@mui/icons-material/SearchOutlined";
+import Snackbar from "@mui/material/Snackbar";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
 import terniumLogo from "../../public/assets/imgs/ternium_color.png";
+import React, { useState } from "react";
+import { auth } from "@/config/environment/firebase";
+import { DataGrid } from "@mui/x-data-grid";
+import { signOut } from "firebase/auth";
+import { TableEmpleado } from "@/utils/types/dbTables";
+import { themeColors } from "@/config/theme";
+import { useRouter } from "next/router";
+import { useUser } from "@/providers/user";
 
 function Search() {
+    const [dataEmpleados, setDataEmpleados] = useState<TableEmpleado[]>([]);
     const [open, setOpen] = useState(false);
     const [openSnack, setOpenSnack] = useState(false);
+    const router = useRouter();
     const { user } = useUser();
+
+    useState(() => {
+        const fetchData = async () => {
+            try {
+                const res = await fetch("/api/getEmpleados");
+                const empleados: TableEmpleado[] = await res.json();
+                console.log(empleados);
+                setDataEmpleados(empleados);
+            } catch (err) {
+                console.error("Couldn't get data from table empleados");
+            }
+        };
+        fetchData();
+    });
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -204,7 +223,7 @@ function Search() {
                     }}
                 >
                     <DataGrid
-                        rows={rows}
+                        rows={dataEmpleados}
                         columns={columns}
                         initialState={{
                             pagination: {
@@ -213,56 +232,27 @@ function Search() {
                                 },
                             },
                         }}
+                        getRowId={(row) => row.id_empleado}
                         pageSizeOptions={[5]}
-                        checkboxSelection
+                        autoHeight
                         disableRowSelectionOnClick
+                        onRowClick={(params) => router.push(`/employee?id=${params.id}`)}
                     />
                 </Box>
             </Box>
         </Box>
     );
 }
+
 const columns = [
-    { field: "id", headerName: "ID", width: 90 },
-    {
-        field: "firstName",
-        headerName: "First name",
-        width: 150,
-        editable: true,
-    },
-    {
-        field: "lastName",
-        headerName: "Last name",
-        width: 150,
-        editable: true,
-    },
-    {
-        field: "age",
-        headerName: "Age",
-        type: "number",
-        width: 110,
-        editable: true,
-    },
-    {
-        field: "fullName",
-        headerName: "Full name",
-        description: "This column has a value getter and is not sortable.",
-        sortable: false,
-        width: 160,
-        valueGetter: (params: { row: { firstName: any; lastName: any } }) =>
-            `${params.row.firstName || ""} ${params.row.lastName || ""}`,
-    },
+    { field: "id_empleado", headerName: "ID", width: 80 },
+    { field: "nombre", headerName: "Nombre", width: 100 },
+    { field: "antiguedad", headerName: "Antigüedad", width: 120 },
+    { field: "universidad", headerName: "Universidad", width: 140 },
+    { field: "area_manager", headerName: "Area Manager", width: 140 },
+    { field: "direccion", headerName: "Dirección", width: 120 },
+    { field: "puesto", headerName: "Puesto", width: 100 },
+    { field: "pc_cat", headerName: "PC - CAT", width: 100 },
 ];
 
-const rows = [
-    { id: 1, lastName: "Snow", firstName: "Jon", age: 35 },
-    { id: 2, lastName: "Lannister", firstName: "Cersei", age: 42 },
-    { id: 3, lastName: "Lannister", firstName: "Jaime", age: 45 },
-    { id: 4, lastName: "Stark", firstName: "Arya", age: 16 },
-    { id: 5, lastName: "Targaryen", firstName: "Daenerys", age: null },
-    { id: 6, lastName: "Melisandre", firstName: null, age: 150 },
-    { id: 7, lastName: "Clifford", firstName: "Ferrara", age: 44 },
-    { id: 8, lastName: "Frances", firstName: "Rossini", age: 36 },
-    { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
-];
 export default Search;
