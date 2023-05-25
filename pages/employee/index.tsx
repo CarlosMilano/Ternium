@@ -29,19 +29,15 @@ import {
     TableTrayectoria,
 } from "@/utils/types/dbTables";
 import LabelledField from "@/components/employee/LabelledField";
-import { TextField } from "@mui/material";
+import TextField from "@mui/material/TextField";
 import { GetEmpleadoRequestBody } from "../api/getTablaEmpleado";
 
-type DataComentarios = { comentarios?: TableComentarios[] };
-type DataResumen = { resumenes?: TableResumen[] };
-type DataEvaluacion = { evaluaciones?: TableEvaluacion[] };
-type DataTrayectoria = { trayectorias?: TableTrayectoria[] };
 type AllData = {
     dataEmpleado: TableEmpleado | null;
-    dataComentarios: DataComentarios | null;
-    dataResumen: DataResumen | null;
-    dataEvaluacion: DataEvaluacion | null;
-    dataTrayectoria: DataTrayectoria | null;
+    dataComentarios: TableComentarios[] | null;
+    dataResumen: TableResumen[] | null;
+    dataEvaluacion: TableEvaluacion[] | null;
+    dataTrayectoria: TableTrayectoria[] | null;
 };
 async function fakeFetch(path: "empleado" | "comentarios" | "resumen" | "evaluacion" | "trayectoria"): Promise<object> {
     const empleado: TableEmpleado = {
@@ -56,51 +52,43 @@ async function fakeFetch(path: "empleado" | "comentarios" | "resumen" | "evaluac
         puesto: "Cocinero de Pizza",
         pc_cat: "51 - 51",
     };
-    const comentarios: DataComentarios = {
-        comentarios: [
-            {
-                id_comentario: "0",
-                nota: 5,
-                comentario:
-                    "Muy bien hecho, eres el mejor empleado que he tenido en toda la vida. Lo recomiendo para hacer " +
-                    "trabajos manuales y sucios. Volvería a contratarlo.",
-            },
-            {
-                id_comentario: "1",
-                nota: 3,
-                comentario: "No pienso que volvería a ser una opción.",
-            },
-        ],
-    };
-    const resumen: DataResumen = {
-        resumenes: [
-            {
-                id_resumen: "0",
-                resumen_perfil: "Cursó la materia de besarse a más de diez perros.",
-            },
-            {
-                id_resumen: "1",
-                resumen_perfil: "Atacó a la reina.",
-            },
-            {
-                id_resumen: "2",
-                resumen_perfil: "No tengo comentarios sobre este empleado.",
-            },
-        ],
-    };
-    const evaluacion: DataEvaluacion = {
-        evaluaciones: [
-            { id_evaluacion: "0", performance: 5, anio: 2023, potencial: 5, curva: "TX DIMA C1" },
-            { id_evaluacion: "1", performance: 4, anio: 2022, potencial: 4, curva: "TX DIMA C1" },
-            { id_evaluacion: "2", performance: 5, anio: 2021, potencial: 5, curva: "TX DIMA C1" },
-        ],
-    };
-    const trayectoria: DataTrayectoria = {
-        trayectorias: [
-            { id_trayectoria: "0", empresa: "Ternium", puesto: "Ingeniero Civil" },
-            { id_trayectoria: "1", empresa: "Lyft", puesto: "Superintendente" },
-        ],
-    };
+    const comentarios: TableComentarios[] = [
+        {
+            id_comentario: "0",
+            nota: 5,
+            comentario:
+                "Muy bien hecho, eres el mejor empleado que he tenido en toda la vida. Lo recomiendo para hacer " +
+                "trabajos manuales y sucios. Volvería a contratarlo.",
+        },
+        {
+            id_comentario: "1",
+            nota: 3,
+            comentario: "No pienso que volvería a ser una opción.",
+        },
+    ];
+    const resumen: TableResumen[] = [
+        {
+            id_resumen: "0",
+            resumen_perfil: "Cursó la materia de besarse a más de diez perros.",
+        },
+        {
+            id_resumen: "1",
+            resumen_perfil: "Atacó a la reina.",
+        },
+        {
+            id_resumen: "2",
+            resumen_perfil: "No tengo comentarios sobre este empleado.",
+        },
+    ];
+    const evaluacion: TableEvaluacion[] = [
+        { id_evaluacion: "0", performance: 5, anio: 2023, potencial: 5, curva: "TX DIMA C1" },
+        { id_evaluacion: "1", performance: 4, anio: 2022, potencial: 4, curva: "TX DIMA C1" },
+        { id_evaluacion: "2", performance: 5, anio: 2021, potencial: 5, curva: "TX DIMA C1" },
+    ];
+    const trayectoria: TableTrayectoria[] = [
+        { id_trayectoria: "0", empresa: "Ternium", puesto: "Ingeniero Civil" },
+        { id_trayectoria: "1", empresa: "Lyft", puesto: "Superintendente" },
+    ];
     return new Promise((resolve) => {
         setTimeout(() => {
             switch (path) {
@@ -143,10 +131,14 @@ const EmployeePage: React.FC = (): JSX.Element => {
     });
     // The data from the different tables in the db.
     const [dataEmpleado, updateDataEmpleado, setDataEmpleado] = useObjectState<TableEmpleado | null>(null);
-    const [dataComentarios, updateDataComentarios, setDataComentarios] = useObjectState<DataComentarios | null>(null);
-    const [dataResumen, updateDataResumen, setDataResumen] = useObjectState<DataResumen | null>(null);
-    const [dataEvaluacion, updateDataEvaluacion, setDataEvaluacion] = useObjectState<DataEvaluacion | null>(null);
-    const [dataTrayectoria, updateDataTrayectoria, setDataTrayectoria] = useObjectState<DataTrayectoria | null>(null);
+    const [dataComentarios, updateDataComentarios, setDataComentarios] = useObjectState<TableComentarios[] | null>(
+        null
+    );
+    const [dataResumen, updateDataResumen, setDataResumen] = useObjectState<TableResumen[] | null>(null);
+    const [dataEvaluacion, updateDataEvaluacion, setDataEvaluacion] = useObjectState<TableEvaluacion[] | null>(null);
+    const [dataTrayectoria, updateDataTrayectoria, setDataTrayectoria] = useObjectState<TableTrayectoria[] | null>(
+        null
+    );
     // The index of the section being currently edited.
     const [editSectionIndex, setEditSectionIndex] = useState<number | null>(null);
     // The indexes of the selected tabs.
@@ -184,10 +176,10 @@ const EmployeePage: React.FC = (): JSX.Element => {
                 console.error("Error fetching data for Empleado");
             }
             // setDataEmpleado((await fakeFetch("empleado")) as TableEmpleado);
-            setDataComentarios((await fakeFetch("comentarios")) as DataComentarios);
-            setDataResumen((await fakeFetch("resumen")) as DataResumen);
-            setDataEvaluacion((await fakeFetch("evaluacion")) as DataEvaluacion);
-            setDataTrayectoria((await fakeFetch("trayectoria")) as DataTrayectoria);
+            setDataComentarios((await fakeFetch("comentarios")) as TableComentarios[]);
+            setDataResumen((await fakeFetch("resumen")) as TableResumen[]);
+            setDataEvaluacion((await fakeFetch("evaluacion")) as TableEvaluacion[]);
+            setDataTrayectoria((await fakeFetch("trayectoria")) as TableTrayectoria[]);
         };
         fetchData();
     }, []);
@@ -471,7 +463,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                 <TableBody>
                                                     {dataComentarios ? (
                                                         // Tabla comentarios.
-                                                        dataComentarios?.comentarios?.map(
+                                                        dataComentarios?.map(
                                                             (
                                                                 { id_comentario, nota, comentario }: TableComentarios,
                                                                 index: number
@@ -480,7 +472,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                                     HTMLInputElement
                                                                 > = (e: ChangeEvent<HTMLInputElement>) => {
                                                                     updateDataComentarios(
-                                                                        `comentarios.${index}.nota`,
+                                                                        `${index}.nota`,
                                                                         e.target.value
                                                                     );
                                                                 };
@@ -488,7 +480,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                                     HTMLInputElement
                                                                 > = (e: ChangeEvent<HTMLInputElement>) => {
                                                                     updateDataComentarios(
-                                                                        `comentarios.${index}.comentario`,
+                                                                        `${index}.comentario`,
                                                                         e.target.value
                                                                     );
                                                                 };
@@ -599,7 +591,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                 <TableBody>
                                                     {dataResumen ? (
                                                         // Table Resumen.
-                                                        dataResumen?.resumenes?.map(
+                                                        dataResumen?.map(
                                                             (
                                                                 { id_resumen, resumen_perfil }: TableResumen,
                                                                 index: number
@@ -608,7 +600,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                                     e: ChangeEvent<HTMLInputElement>
                                                                 ) => {
                                                                     updateDataResumen(
-                                                                        `resumenes.${index}.resumen_perfil`,
+                                                                        `${index}.resumen_perfil`,
                                                                         e.target.value
                                                                     );
                                                                 };
@@ -690,7 +682,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                         disableSave={isUpdatingData}
                                     >
                                         {dataEvaluacion ? (
-                                            dataEvaluacion?.evaluaciones?.map(
+                                            dataEvaluacion?.map(
                                                 (
                                                     {
                                                         id_evaluacion,
@@ -706,18 +698,12 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                     const onChangePotencial: ChangeEventHandler<HTMLInputElement> = (
                                                         e: ChangeEvent<HTMLInputElement>
                                                     ) => {
-                                                        updateDataEvaluacion(
-                                                            `evaluaciones.${index}.potencial`,
-                                                            e.target.value
-                                                        );
+                                                        updateDataEvaluacion(`${index}.potencial`, e.target.value);
                                                     };
                                                     const onChangeCurva: ChangeEventHandler<HTMLInputElement> = (
                                                         e: ChangeEvent<HTMLInputElement>
                                                     ) => {
-                                                        updateDataEvaluacion(
-                                                            `evaluaciones.${index}.curva`,
-                                                            e.target.value
-                                                        );
+                                                        updateDataEvaluacion(`${index}.curva`, e.target.value);
                                                     };
                                                     return (
                                                         <Stack direction="row" gap={1} key={id_evaluacion}>
@@ -817,7 +803,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                         disableSave={isUpdatingData}
                                     >
                                         {dataTrayectoria ? (
-                                            dataTrayectoria?.trayectorias?.map(
+                                            dataTrayectoria?.map(
                                                 (
                                                     { id_trayectoria, empresa, puesto }: TableTrayectoria,
                                                     index: number
@@ -825,18 +811,12 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                     const onChangeEmpresa: ChangeEventHandler<HTMLInputElement> = (
                                                         e: ChangeEvent<HTMLInputElement>
                                                     ) => {
-                                                        updateDataTrayectoria(
-                                                            `trayectorias.${index}.empresa`,
-                                                            e.target.value
-                                                        );
+                                                        updateDataTrayectoria(`${index}.empresa`, e.target.value);
                                                     };
                                                     const onChangePuesto: ChangeEventHandler<HTMLInputElement> = (
                                                         e: ChangeEvent<HTMLInputElement>
                                                     ) => {
-                                                        updateDataTrayectoria(
-                                                            `trayectorias.${index}.puesto`,
-                                                            e.target.value
-                                                        );
+                                                        updateDataTrayectoria(`${index}.puesto`, e.target.value);
                                                     };
                                                     return (
                                                         <List sx={{ width: "100%" }} key={id_trayectoria}>
