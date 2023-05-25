@@ -19,7 +19,9 @@ const LabelledField: React.FC<LabelledFieldProps> = ({
     onChange,
     children,
 }): JSX.Element => {
-    const inputElement: JSX.Element = <TextField value={value} onChange={onChange} sx={{ marginRight: "1rem" }} />;
+    const inputElement: JSX.Element = (
+        <TextField value={value || ""} onChange={onChange} sx={{ marginRight: "1rem" }} />
+    );
 
     return (
         <div>
