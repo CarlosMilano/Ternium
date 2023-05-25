@@ -3,7 +3,7 @@ import getEmpleadoData from "./services/getTablaEmpleado";
 import { TableEmpleado } from "@/utils/types/dbTables";
 
 export interface GetEmpleadoRequestBody {
-    id_empleado: string;
+    id_empleado: number;
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
@@ -17,7 +17,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             res.status(404).json({ error: `Empleado with id_empleado = ${id_empleado} not found` });
         }
     } catch (error) {
-        console.error("Error fetching data:", error);
         res.status(500).json({ error: "Error fetching data" });
     }
 }

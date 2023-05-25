@@ -19,7 +19,7 @@ import TableRow from "@mui/material/TableRow";
 import TabPanel from "@/components/employee/TabPanel";
 import Tabs from "@mui/material/Tabs";
 import EditSection, { EditEventHandler, Editable } from "@/components/employee/EditSection";
-import { ChangeEvent, ChangeEventHandler, FormEventHandler, MouseEventHandler, useEffect, useState } from "react";
+import { ChangeEvent, ChangeEventHandler, FormEvent, FormEventHandler, MouseEvent, useEffect, useState } from "react";
 import useObjectState from "@/utils/hooks/useObjectState";
 import {
     TableComentarios,
@@ -30,14 +30,22 @@ import {
 } from "@/utils/types/dbTables";
 import LabelledField from "@/components/employee/LabelledField";
 import { TextField } from "@mui/material";
+import { GetEmpleadoRequestBody } from "../api/getTablaEmpleado";
 
 type DataComentarios = { comentarios?: TableComentarios[] };
 type DataResumen = { resumenes?: TableResumen[] };
 type DataEvaluacion = { evaluaciones?: TableEvaluacion[] };
 type DataTrayectoria = { trayectorias?: TableTrayectoria[] };
+type AllData = {
+    dataEmpleado: TableEmpleado | null;
+    dataComentarios: DataComentarios | null;
+    dataResumen: DataResumen | null;
+    dataEvaluacion: DataEvaluacion | null;
+    dataTrayectoria: DataTrayectoria | null;
+};
 async function fakeFetch(path: "empleado" | "comentarios" | "resumen" | "evaluacion" | "trayectoria"): Promise<object> {
     const empleado: TableEmpleado = {
-        id_empleado: "0",
+        id_empleado: 1,
         nombre: "Jorge Claudio González Becerril",
         edad: 21,
         antiguedad: 1,
@@ -124,6 +132,15 @@ async function fakeFetch(path: "empleado" | "comentarios" | "resumen" | "evaluac
  * The page that displays an employee's information.
  */
 const EmployeePage: React.FC = (): JSX.Element => {
+    // A record of the most recent fetched data.
+    // Used to restore the value of fields when edits are cancelled.
+    const [fetchedData, updateFetchedData, setFetchedData] = useObjectState<AllData>({
+        dataEmpleado: null,
+        dataComentarios: null,
+        dataResumen: null,
+        dataEvaluacion: null,
+        dataTrayectoria: null,
+    });
     // The data from the different tables in the db.
     const [dataEmpleado, updateDataEmpleado, setDataEmpleado] = useObjectState<TableEmpleado | null>(null);
     const [dataComentarios, updateDataComentarios, setDataComentarios] = useObjectState<DataComentarios | null>(null);
@@ -135,22 +152,99 @@ const EmployeePage: React.FC = (): JSX.Element => {
     // The indexes of the selected tabs.
     const [leftTabsIndex, setLeftTabsIndex] = useState<number>(0);
     const [rightTabsIndex, setRightTabsIndex] = useState<number>(0);
+    // True if the page is doing a POST of updated data.
+    // Determines if publish buttons should be disabled.
+    const [isUpdatingData, setIsUpdatingData] = useState<boolean>(false);
+
+    const idEmpleado: number = 1;
 
     // Data fetching.
     useEffect(() => {
         const fetchData = async () => {
-            setDataEmpleado(await fakeFetch("empleado"));
-            setDataComentarios(await fakeFetch("comentarios"));
-            setDataResumen(await fakeFetch("resumen"));
-            setDataEvaluacion(await fakeFetch("evaluacion"));
-            setDataTrayectoria(await fakeFetch("trayectoria"));
+            // Fetch data for Empleado.
+            try {
+                const bodyEmpleado: GetEmpleadoRequestBody = {
+                    id_empleado: idEmpleado,
+                };
+                const res = await fetch("/api/getTablaEmpleado", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(bodyEmpleado),
+                });
+                if (res.ok) {
+                    const dataEmpleado: TableEmpleado = await res.json();
+                    setDataEmpleado(dataEmpleado);
+                    updateFetchedData("dataEmpleado", dataEmpleado);
+                    console.log(dataEmpleado);
+                } else {
+                    const error: { error: string } = await res.json();
+                    console.error(error.error);
+                }
+            } catch (err) {
+                console.error("Error fetching data for Empleado");
+            }
+            // setDataEmpleado((await fakeFetch("empleado")) as TableEmpleado);
+            setDataComentarios((await fakeFetch("comentarios")) as DataComentarios);
+            setDataResumen((await fakeFetch("resumen")) as DataResumen);
+            setDataEvaluacion((await fakeFetch("evaluacion")) as DataEvaluacion);
+            setDataTrayectoria((await fakeFetch("trayectoria")) as DataTrayectoria);
         };
         fetchData();
     }, []);
 
     const handleOnEdit: EditEventHandler = (_, index) => setEditSectionIndex(index);
     const handleOnSubmit: FormEventHandler<HTMLFormElement> = () => {};
-    const handleOnCancel: MouseEventHandler<HTMLButtonElement> = () => setEditSectionIndex(null);
+    const handleOnCancel: (
+        event: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>,
+        type: "empleado" | "comentarios" | "resumen" | "evaluacion" | "trayectoria"
+    ) => void = (e, type) => {
+        setEditSectionIndex(null);
+        switch (type) {
+            case "empleado":
+                setDataEmpleado(fetchedData.dataEmpleado);
+                break;
+            case "comentarios":
+                setDataComentarios(fetchedData.dataComentarios);
+                break;
+            case "resumen":
+                setDataResumen(fetchedData.dataResumen);
+                break;
+            case "evaluacion":
+                setDataEvaluacion(fetchedData.dataEvaluacion);
+                break;
+            case "trayectoria":
+                setDataTrayectoria(fetchedData.dataTrayectoria);
+                break;
+            default:
+                throw Error("type not found.");
+        }
+    };
+    const handleOnSubmitEmpleado: FormEventHandler<HTMLFormElement> = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setIsUpdatingData(true);
+        console.log("Updating data...");
+        try {
+            const res = await fetch("/api/updateTablaEmpleado", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(dataEmpleado),
+            });
+            if (res.ok) {
+                const result = await res.json();
+                updateFetchedData("dataEmpleado", dataEmpleado);
+            } else {
+                console.error("Error updating data for Empleado: ", res.statusText);
+                setDataEmpleado(fetchedData.dataEmpleado);
+            }
+        } catch (err) {
+            console.error("Error updating data for Empleado");
+        }
+        console.log("Updated ended!");
+        setEditSectionIndex(null);
+        setIsUpdatingData(false);
+    };
 
     // Generates a color for the employee's avatar, based on their name.
     const randomColor: string = `hsl(${dataEmpleado?.nombre
@@ -182,7 +276,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                         <>
                                             {dataEmpleado ? (
                                                 <Avatar sx={{ bgcolor: randomColor }}>
-                                                    {dataEmpleado?.nombre?.at(0)}
+                                                    {dataEmpleado?.nombre?.at(0)?.toUpperCase()}
                                                 </Avatar>
                                             ) : (
                                                 <Skeleton variant="circular" width={40} height={40} />
@@ -202,9 +296,10 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                     index={0}
                                     currentIndex={editSectionIndex}
                                     onEdit={handleOnEdit}
-                                    onSubmit={handleOnSubmit}
-                                    onCancel={handleOnCancel}
+                                    onSubmit={handleOnSubmitEmpleado}
+                                    onCancel={(e) => handleOnCancel(e, "empleado")}
                                     disabled={dataEmpleado === null}
+                                    disableSave={isUpdatingData}
                                 >
                                     <Grid container rowGap={2}>
                                         {/* Edad */}
@@ -361,8 +456,9 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                         currentIndex={editSectionIndex}
                                         onEdit={handleOnEdit}
                                         onSubmit={handleOnSubmit}
-                                        onCancel={handleOnCancel}
+                                        onCancel={(e) => handleOnCancel(e, "comentarios")}
                                         disabled={dataComentarios === null}
+                                        disableSave={isUpdatingData}
                                     >
                                         <TableContainer>
                                             <Table>
@@ -489,8 +585,9 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                         currentIndex={editSectionIndex}
                                         onEdit={handleOnEdit}
                                         onSubmit={handleOnSubmit}
-                                        onCancel={handleOnCancel}
+                                        onCancel={(e) => handleOnCancel(e, "resumen")}
                                         disabled={dataResumen === null}
+                                        disableSave={isUpdatingData}
                                     >
                                         <TableContainer>
                                             <Table>
@@ -588,8 +685,9 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                         currentIndex={editSectionIndex}
                                         onEdit={handleOnEdit}
                                         onSubmit={handleOnSubmit}
-                                        onCancel={handleOnCancel}
+                                        onCancel={(e) => handleOnCancel(e, "evaluacion")}
                                         disabled={dataEvaluacion === null}
+                                        disableSave={isUpdatingData}
                                     >
                                         {dataEvaluacion ? (
                                             dataEvaluacion?.evaluaciones?.map(
@@ -714,8 +812,9 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                         currentIndex={editSectionIndex}
                                         onEdit={handleOnEdit}
                                         onSubmit={handleOnSubmit}
-                                        onCancel={handleOnCancel}
+                                        onCancel={(e) => handleOnCancel(e, "trayectoria")}
                                         disabled={dataTrayectoria === null}
+                                        disableSave={isUpdatingData}
                                     >
                                         {dataTrayectoria ? (
                                             dataTrayectoria?.trayectorias?.map(

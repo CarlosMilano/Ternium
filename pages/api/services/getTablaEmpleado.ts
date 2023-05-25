@@ -2,7 +2,7 @@ import { PoolClient, QueryResult } from "pg";
 import pool from "../dbConfig";
 import { TableEmpleado } from "@/utils/types/dbTables";
 
-export default async function getEmpleadoData(idEmpleado: string): Promise<TableEmpleado | null> {
+export default async function getEmpleadoData(idEmpleado: number): Promise<TableEmpleado | null> {
     let client: PoolClient | null = null;
     try {
         client = (await pool.connect()) as PoolClient;
