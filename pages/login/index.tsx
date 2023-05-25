@@ -77,24 +77,23 @@ const Login = () => {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [wrongPassword, setWrongPassword] = useState<boolean>(false);
-    const { setIsLogged } = useUser();
+    const { user } = useUser();
 
-    useEffect(() => {
-        const unsubscribe: Unsubscribe = auth.onAuthStateChanged((user: User | null) => {
-            if (user) {
-                console.log(user);
-            } else {
-                console.log("%cLa sesión no está iniciada.", "color: yellow;");
-            }
-        });
-        return () => unsubscribe();
-    }, []);
+    // useEffect(() => {
+    //     const unsubscribe: Unsubscribe = auth.onAuthStateChanged((user: User | null) => {
+    //         if (user) {
+    //             console.log(user);
+    //         } else {
+    //             console.log("%cLa sesión no está iniciada.", "color: yellow;");
+    //         }
+    //     });
+    //     return () => unsubscribe();
+    // }, []);
 
     const handleOnSubmit: FormEventHandler<HTMLFormElement> = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
         try {
             const user: UserCredential = await signInWithEmailAndPassword(auth, email, password);
-            setIsLogged(true);
         } catch (err) {
             console.error("Credentials are not valid.");
             setWrongPassword(true);
