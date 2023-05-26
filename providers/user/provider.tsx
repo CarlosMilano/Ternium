@@ -40,7 +40,7 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
         if (user === null) {
             if (router.pathname !== "/login") router.push("/login");
         } else if (user) {
-            if (router.pathname === "/login") router.push("/search");
+            if (router.pathname === "/login") router.push("/");
         }
     }, [user]);
 
