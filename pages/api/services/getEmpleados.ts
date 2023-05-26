@@ -6,7 +6,7 @@ export default async function getEmpleados(): Promise<TableEmpleado[]> {
     let client: PoolClient | null = null;
     try {
         client = (await pool.connect()) as PoolClient;
-        const query: string = `SELECT * FROM empleado`;
+        const query: string = `SELECT * FROM empleado ORDER BY id_empleado`;
 
         const result: QueryResult = await client.query(query);
         const rows = result.rows as TableEmpleado[];
