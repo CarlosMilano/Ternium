@@ -1,6 +1,7 @@
 import Head from "next/head";
 import { Inter } from "next/font/google";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridPaginationModel } from "@mui/x-data-grid";
+import Skeleton from "@mui/material/Skeleton";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
@@ -11,16 +12,22 @@ import Close from "@mui/icons-material/Close";
 import Search from "@mui/icons-material/Search";
 import Navbar from "@/components/Navbar";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useState, ChangeEventHandler, ChangeEvent, Reducer, Dispatch, useReducer } from "react";
+import { useState, ChangeEventHandler, ChangeEvent, Reducer, Dispatch, useReducer, useEffect } from "react";
 import { TableEmpleado } from "@/utils/types/dbTables";
 import { useRouter } from "next/router";
 import { DropdownButton } from "@/components/themed/ThemedButtons";
+import { GetPageEmpleadosRequestBody } from "./api/getPageEmpleados";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
+    // The text from the search bar.
     const [search, setSearch] = useState<string>("");
-    const [dataEmpleados, setDataEmpleados] = useState<TableEmpleado[]>([]);
+    // The data from the table empleados.
+    const [dataEmpleados, setDataEmpleados] = useState<TableEmpleado[] | null>(null);
+    // The total amount of employees. (Currently, the index of the last employee)
+    const [amountOfEmployees, setAmountOfEmployees] = useState<number>(0);
+    // The selected filters.
     type State = {
         Potencial: boolean;
         Perf: boolean;
@@ -50,19 +57,53 @@ export default function Home() {
     const md: boolean = useMediaQuery("(max-width: 900px)");
     const router = useRouter();
 
-    useState(() => {
+    // The amount of employees (rows) shown per page.
+    // Manually update this value if the amount of rows changes in the UI.
+    // For example, if you make the height of the table bigger.
+    const pageSize: number = 10;
+    const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+        page: 0,
+        pageSize: pageSize,
+    });
+
+    useEffect(() => {
+        console.log(paginationModel);
         const fetchData = async () => {
+            // Fetch total amount of empleados.
             try {
-                const res = await fetch("/api/getEmpleados");
-                const empleados: TableEmpleado[] = await res.json();
-                console.log(empleados);
-                setDataEmpleados(empleados);
+                const res = await fetch("/api/getEmpleadosCount");
+                const total: number = await res.json();
+                console.log(total);
+                setAmountOfEmployees(total);
+            } catch (err) {
+                console.error("Couldn't get count from table empleados");
+            }
+            // Fetch empleados in current page.
+            try {
+                const bodyPage: GetPageEmpleadosRequestBody = {
+                    page: paginationModel.page + 1,
+                    pageSize: pageSize,
+                };
+                const res = await fetch("/api/getPageEmpleados", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(bodyPage),
+                });
+                if (res.ok) {
+                    const empleados: TableEmpleado[] = await res.json();
+                    console.log(empleados);
+                    setDataEmpleados(empleados);
+                } else {
+                    const error: { error: string } = await res.json();
+                    setDataEmpleados([]);
+                    console.error(error.error);
+                }
             } catch (err) {
                 console.error("Couldn't get data from table empleados");
             }
         };
         fetchData();
-    });
+    }, [paginationModel]);
 
     const onChangeSearch: ChangeEventHandler<HTMLInputElement> = (e: ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value);
@@ -150,32 +191,41 @@ export default function Home() {
                         </Grid>
                     </Stack>
                     <main>
-                        <DataGrid
-                            columns={[
-                                { field: "id_empleado", headerName: "ID", flex: 0.1, sortable: false },
-                                { field: "nombre", headerName: "Nombre", flex: 1, sortable: false },
-                                { field: "antiguedad", headerName: "Antigüedad", flex: 0.8, sortable: false },
-                                { field: "universidad", headerName: "Universidad", flex: 1, sortable: false },
-                                { field: "area_manager", headerName: "Area Manager", flex: 1, sortable: false },
-                                { field: "direccion", headerName: "Dirección", flex: 1, sortable: false },
-                                { field: "puesto", headerName: "Puesto", flex: 1, sortable: false },
-                                { field: "pc_cat", headerName: "PC - CAT", flex: 0.8, sortable: false },
-                            ]}
-                            rows={dataEmpleados}
-                            getRowId={(row: TableEmpleado) => row.id_empleado}
-                            initialState={{
-                                pagination: {
-                                    paginationModel: { page: 0 },
-                                },
-                            }}
-                            autoPageSize
-                            rowHeight={40}
-                            sx={{ height: 528 }}
-                            rowSelection={false}
-                            disableColumnMenu
-                            sortingMode="server"
-                            onRowClick={({ id }) => router.push(`/employee?id=${id}`)}
-                        />
+                        {dataEmpleados ? (
+                            <DataGrid
+                                columns={[
+                                    { field: "id_empleado", headerName: "ID", flex: 0.1, sortable: false },
+                                    { field: "nombre", headerName: "Nombre", flex: 1, sortable: false },
+                                    { field: "antiguedad", headerName: "Antigüedad", flex: 0.8, sortable: false },
+                                    { field: "universidad", headerName: "Universidad", flex: 1, sortable: false },
+                                    { field: "area_manager", headerName: "Area Manager", flex: 1, sortable: false },
+                                    { field: "direccion", headerName: "Dirección", flex: 1, sortable: false },
+                                    { field: "puesto", headerName: "Puesto", flex: 0.8, sortable: false },
+                                    { field: "pc_cat", headerName: "PC - CAT", flex: 0.8, sortable: false },
+                                ]}
+                                rows={dataEmpleados}
+                                getRowId={(row: TableEmpleado) => row.id_empleado}
+                                rowHeight={40}
+                                sx={{ height: 528 }}
+                                initialState={{ pagination: { paginationModel: paginationModel } }}
+                                rowSelection={false}
+                                disableColumnMenu
+                                sortingMode="server"
+                                paginationMode="server"
+                                pageSizeOptions={[10]}
+                                rowCount={amountOfEmployees}
+                                paginationModel={paginationModel}
+                                onPaginationModelChange={setPaginationModel}
+                                onRowClick={({ id }) => router.push(`/employee?id=${id}`)}
+                            />
+                        ) : (
+                            // Skeleton for the employee table.
+                            <Stack height={528} gap={1}>
+                                <Skeleton variant="rounded" width="100%" height={58} />
+                                <Skeleton variant="rounded" width="100%" height={420} />
+                                <Skeleton variant="rounded" width="100%" height={58} />
+                            </Stack>
+                        )}
                     </main>
                 </Stack>
             </Stack>
