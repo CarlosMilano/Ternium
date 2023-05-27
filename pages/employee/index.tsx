@@ -37,6 +37,7 @@ import { GetEvaluacionRequestBody } from "../api/getTablaEvaluacion";
 import deepClone from "@/utils/deepClone";
 import { GetTrayectoriaRequestBody } from "../api/getTablaTrayectoria";
 import { useRouter } from "next/router";
+import Navbar from "@/components/Navbar";
 
 type AllData = {
     dataEmpleado: TableEmpleado | null;
@@ -396,6 +397,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                 <meta name="description" content="Ficha del empleado" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
             </Head>
+            <Navbar />
             <Box>
                 <Container>
                     <Grid container gap={1} justifyContent="center">
@@ -442,6 +444,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                 value={dataEmpleado?.edad}
                                                 sectionIndex={0}
                                                 currentSectionIndex={editSectionIndex}
+                                                isNumeric
                                                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                                                     updateDataEmpleado("edad", e.target.value)
                                                 }
@@ -458,6 +461,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                 value={dataEmpleado?.antiguedad}
                                                 sectionIndex={0}
                                                 currentSectionIndex={editSectionIndex}
+                                                isNumeric
                                                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                                                     updateDataEmpleado("antiguedad", e.target.value)
                                                 }
@@ -630,6 +634,10 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                                         value={nota || ""}
                                                                         onChange={onChangeNota}
                                                                         size="small"
+                                                                        inputProps={{
+                                                                            inputMode: "numeric",
+                                                                            pattern: "[0-9]*",
+                                                                        }}
                                                                     />
                                                                 );
                                                                 const inputElementComentario: JSX.Element = (
