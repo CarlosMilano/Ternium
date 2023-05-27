@@ -9,6 +9,7 @@ interface LabelledFieldProps {
     sectionIndex: number;
     currentSectionIndex: number | null;
     onChange: ChangeEventHandler<HTMLInputElement>;
+    isNumeric?: boolean;
     children: ReactNode;
 }
 const LabelledField: React.FC<LabelledFieldProps> = ({
@@ -17,9 +18,17 @@ const LabelledField: React.FC<LabelledFieldProps> = ({
     sectionIndex,
     currentSectionIndex,
     onChange,
+    isNumeric,
     children,
 }): JSX.Element => {
-    const inputElement: JSX.Element = (
+    const inputElement: JSX.Element = isNumeric ? (
+        <TextField
+            value={value || ""}
+            onChange={onChange}
+            sx={{ marginRight: "1rem" }}
+            inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+        />
+    ) : (
         <TextField value={value || ""} onChange={onChange} sx={{ marginRight: "1rem" }} />
     );
 
