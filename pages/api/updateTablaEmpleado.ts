@@ -16,6 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         direccion,
         puesto,
         pc_cat,
+        habilitado,
         id_empleado,
     }: TableEmpleado = req.body;
 
@@ -29,6 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             direccion || null,
             puesto || null,
             pc_cat || null,
+            habilitado || null,
             id_empleado
         );
         res.status(200).json(result);

@@ -10,6 +10,7 @@ export async function updateTablaEmpleados(
     direccion: string | null,
     puesto: string | null,
     pc_cat: string | null,
+    habilitado: boolean | null,
     id_empleado: number
 ): Promise<QueryResult> {
     const client = await pool.connect();
@@ -25,11 +26,12 @@ export async function updateTablaEmpleados(
         area_manager = COALESCE($5, area_manager),
         direccion = COALESCE($6, direccion),
         puesto = COALESCE($7, puesto),
-        pc_cat = COALESCE($8, pc_cat)
-      WHERE id_empleado = $9
+        pc_cat = COALESCE($8, pc_cat),
+        habilitado = COALESCE($9, habilitado)
+      WHERE id_empleado = $10
     `;
 
-        const values = [nombre, edad, antiguedad, universidad, area_manager, direccion, puesto, pc_cat, id_empleado];
+        const values = [nombre, edad, antiguedad, universidad, area_manager, direccion, puesto, pc_cat, habilitado, id_empleado];
 
         const result: QueryResult = await client.query(updateQuery, values);
         return result;

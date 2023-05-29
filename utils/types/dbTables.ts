@@ -9,6 +9,7 @@ export type TableEmpleado = {
     direccion?: string;
     puesto?: string;
     pc_cat?: string;
+    habilitado?: boolean;
 };
 export type TableTrayectoria = {
     id_trayectoria: number;
