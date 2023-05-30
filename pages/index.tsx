@@ -5,22 +5,18 @@ import Skeleton from "@mui/material/Skeleton";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
-import Chip from "@mui/material/Chip";
 import InputAdornment from "@mui/material/InputAdornment";
 import FilterAltOutlined from "@mui/icons-material/FilterAltOutlined";
-import Close from "@mui/icons-material/Close";
 import Search from "@mui/icons-material/Search";
 import Navbar from "@/components/Navbar";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useState, ChangeEventHandler, ChangeEvent, Reducer, Dispatch, useReducer, useEffect } from "react";
+import { useState, ChangeEvent, Reducer, useReducer, useEffect } from "react";
 import { TableEmpleado } from "@/utils/types/dbTables";
 import { useRouter } from "next/router";
 import { DropdownButton } from "@/components/themed/ThemedButtons";
 import { GetPageEmpleadosRequestBody } from "./api/getPageEmpleados";
 import FilterChip from "@/components/FilterChip";
 import { FilterData, Filters } from "@/utils/types/filters";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
     // The text from the search bar.
@@ -91,6 +87,8 @@ export default function Home() {
         page: 0,
         pageSize: pageSize,
     });
+    // Describes if the employee list is being loaded.
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     // The definition of the columns in the data grid.
     const columns: GridColDef<TableEmpleado>[] = [
@@ -98,23 +96,16 @@ export default function Home() {
         { field: "nombre", headerName: "Nombre", flex: 1, sortable: false },
         { field: "antiguedad", headerName: "Antigüedad", flex: 0.8, sortable: false },
         { field: "universidad", headerName: "Universidad", flex: 1, sortable: false },
-        { field: "area_manager", headerName: "Area Manager", flex: 1, sortable: false },
+        { field: "area_manager", headerName: "Jefe", flex: 1, sortable: false },
         { field: "direccion", headerName: "Dirección", flex: 1, sortable: false },
         { field: "puesto", headerName: "Puesto", flex: 0.8, sortable: false },
         { field: "pc_cat", headerName: "PC - CAT", flex: 0.8, sortable: false },
-        {
-            field: "habilitado",
-            valueFormatter: (params): string => (params.value ? "Sí" : "No"),
-            headerName: "Habilitado",
-            flex: 0.8,
-            sortable: false,
-        },
     ];
 
     // Fetches the list of employees.
     // Gets called each time the pagination model is set.
     useEffect(() => {
-        console.log(paginationModel);
+        setIsLoading(true);
         const fetchData = async () => {
             // Fetch empleados in current page, and the total amount in the query.
             try {
@@ -131,10 +122,9 @@ export default function Home() {
                 if (res.ok) {
                     const [countWrapper, empleados]: [{ count: number }, TableEmpleado[]] = await res.json();
                     const count: number = Number(countWrapper.count);
-                    console.log(count);
-                    console.log(empleados);
                     setAmountOfEmployees(count);
                     setDataEmpleados(empleados);
+                    setIsLoading(false);
                 } else {
                     const error: { error: string } = await res.json();
                     setDataEmpleados([]);
@@ -150,7 +140,6 @@ export default function Home() {
     // Resets the pagination model each time the filters change.
     // Allows the list of employees to be updated.
     useEffect(() => {
-        console.log(filters);
         setPaginationModel({
             page: 0,
             pageSize: pageSize,
@@ -289,6 +278,7 @@ export default function Home() {
                                 pageSizeOptions={[10]}
                                 rowCount={amountOfEmployees}
                                 paginationModel={paginationModel}
+                                loading={isLoading}
                                 onPaginationModelChange={setPaginationModel}
                                 onRowClick={({ id }) => router.push(`/employee?id=${id}`)}
                             />
