@@ -1,5 +1,4 @@
 import Head from "next/head";
-import { Inter } from "next/font/google";
 import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 import Skeleton from "@mui/material/Skeleton";
 import Grid from "@mui/material/Grid";
@@ -8,12 +7,14 @@ import Stack from "@mui/material/Stack";
 import InputAdornment from "@mui/material/InputAdornment";
 import FilterAltOutlined from "@mui/icons-material/FilterAltOutlined";
 import Search from "@mui/icons-material/Search";
+import PictureAsPdf from "@mui/icons-material/PictureAsPdf";
+import UploadFile from "@mui/icons-material/UploadFile";
 import Navbar from "@/components/Navbar";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useState, ChangeEvent, Reducer, useReducer, useEffect } from "react";
 import { TableEmpleado } from "@/utils/types/dbTables";
 import { useRouter } from "next/router";
-import { DropdownButton } from "@/components/themed/ThemedButtons";
+import { ContainedButton, DropdownButton, OutlinedButton } from "@/components/themed/ThemedButtons";
 import { GetPageEmpleadosRequestBody } from "./api/getPageEmpleados";
 import FilterChip from "@/components/FilterChip";
 import { FilterData, Filters } from "@/utils/types/filters";
@@ -174,7 +175,28 @@ export default function Home() {
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
+            {/* Fixed overlay buttons */}
+            <Stack
+                position="fixed"
+                width="100vw"
+                height="100vh"
+                alignItems="flex-end"
+                justifyContent="flex-end"
+                gap={md ? 1 : 2}
+                padding={md ? "12px" : "24px"}
+            >
+                {!md && (
+                    <OutlinedButton variant="outlined" startIcon={<UploadFile />}>
+                        Subir
+                    </OutlinedButton>
+                )}
+                <ContainedButton variant="contained" startIcon={<PictureAsPdf />}>
+                    Descargar
+                </ContainedButton>
+            </Stack>
+            {/* Navigation Bar */}
             <Navbar />
+            {/* Main Content */}
             <Stack alignItems="center" height="calc(100vh - 128px)">
                 <Stack
                     gap={4}
