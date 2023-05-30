@@ -17,6 +17,8 @@ import { TableEmpleado } from "@/utils/types/dbTables";
 import { useRouter } from "next/router";
 import { DropdownButton } from "@/components/themed/ThemedButtons";
 import { GetPageEmpleadosRequestBody } from "./api/getPageEmpleados";
+import FilterChip from "@/components/FilterChip";
+import { FilterData, Filters } from "@/utils/types/filters";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,32 +29,56 @@ export default function Home() {
     const [dataEmpleados, setDataEmpleados] = useState<TableEmpleado[] | null>(null);
     // The total amount of employees. (Currently, the index of the last employee)
     const [amountOfEmployees, setAmountOfEmployees] = useState<number>(0);
-    // The selected filters.
-    type State = {
-        Potencial: boolean;
-        Perf: boolean;
-        "Estructura 3": boolean;
-        "Estructura 4": boolean;
-        Jefe: boolean;
+    // The state of the filters.
+    type FilterType = {
+        name: string;
+        isNumeric: boolean;
+        isActive: boolean;
     };
-    type Action = { key: string; type: "add" | "remove" };
-    const reducer: Reducer<State, Action> = (state: State, action: Action): State => {
+    type FilterDataState = {
+        [key: string]: FilterType;
+    };
+    type FilterDataAction = { key: string; type: "add" | "remove" };
+    const filterDataReducer: Reducer<FilterDataState, FilterDataAction> = (
+        state: FilterDataState,
+        action: FilterDataAction
+    ): FilterDataState => {
         switch (action.type) {
             case "add":
-                return { ...state, [action.key]: true };
+                return { ...state, [action.key]: { ...state[action.key], isActive: true } };
             case "remove":
-                return { ...state, [action.key]: false };
+                return { ...state, [action.key]: { ...state[action.key], isActive: false } };
             default:
                 throw new Error("Unhandled action type: " + action.type);
         }
     };
-    const [filters, dispatch]: [State, Dispatch<Action>] = useReducer<Reducer<State, Action>>(reducer, {
-        Potencial: false,
-        Perf: false,
-        "Estructura 3": false,
-        "Estructura 4": false,
-        Jefe: false,
+    const [filterData, dispatchFilterData] = useReducer<Reducer<FilterDataState, FilterDataAction>>(filterDataReducer, {
+        antiguedad: { name: "Antigüedad", isNumeric: true, isActive: false },
+        universidad: { name: "Universidad", isNumeric: false, isActive: false },
+        area_manager: { name: "Jefe", isNumeric: false, isActive: false },
+        direccion: { name: "Dirección", isNumeric: false, isActive: false },
+        puesto: { name: "Puesto", isNumeric: false, isActive: false },
+        pc_cat: { name: "PC - CAT", isNumeric: false, isActive: false },
+        habilitado: { name: "Habilitado", isNumeric: false, isActive: false },
     });
+    // The selected filters
+    type FiltersAction = { key: string; type: "add" | "remove"; data: FilterData };
+    const filtersReducer: Reducer<Filters, FiltersAction> = (state: Filters, action: FiltersAction): Filters => {
+        switch (action.type) {
+            case "add":
+                return { ...state, [action.key]: action.data };
+            case "remove":
+                return Object.entries(state).reduce((acc: Filters, [key, value]: [string, FilterData]) => {
+                    if (key !== action.key) {
+                        acc[key] = value;
+                    }
+                    return acc;
+                }, {});
+            default:
+                throw new Error("Unhandled action type: " + action.type);
+        }
+    };
+    const [filters, dispatchFilters] = useReducer<Reducer<Filters, FiltersAction>>(filtersReducer, {});
 
     const md: boolean = useMediaQuery("(max-width: 900px)");
     const router = useRouter();
@@ -69,20 +95,12 @@ export default function Home() {
     useEffect(() => {
         console.log(paginationModel);
         const fetchData = async () => {
-            // Fetch total amount of empleados.
-            try {
-                const res = await fetch("/api/getEmpleadosCount");
-                const total: number = await res.json();
-                console.log(total);
-                setAmountOfEmployees(total);
-            } catch (err) {
-                console.error("Couldn't get count from table empleados");
-            }
-            // Fetch empleados in current page.
+            // Fetch empleados in current page, and the total amount in the query.
             try {
                 const bodyPage: GetPageEmpleadosRequestBody = {
-                    page: paginationModel.page + 1,
+                    page: paginationModel.page,
                     pageSize: pageSize,
+                    filters: filters,
                 };
                 const res = await fetch("/api/getPageEmpleados", {
                     method: "POST",
@@ -90,8 +108,11 @@ export default function Home() {
                     body: JSON.stringify(bodyPage),
                 });
                 if (res.ok) {
-                    const empleados: TableEmpleado[] = await res.json();
+                    const [countWrapper, empleados]: [{ count: number }, TableEmpleado[]] = await res.json();
+                    const count: number = Number(countWrapper.count);
+                    console.log(count);
                     console.log(empleados);
+                    setAmountOfEmployees(count);
                     setDataEmpleados(empleados);
                 } else {
                     const error: { error: string } = await res.json();
@@ -104,6 +125,14 @@ export default function Home() {
         };
         fetchData();
     }, [paginationModel]);
+
+    useEffect(() => {
+        console.log(filters);
+        setPaginationModel({
+            page: 0,
+            pageSize: pageSize,
+        });
+    }, [filters]);
 
     const onChangeSearch: ChangeEventHandler<HTMLInputElement> = (e: ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value);
@@ -158,34 +187,47 @@ export default function Home() {
                                     },
                                 }}
                                 disableElevation
-                                options={Object.entries(filters)
-                                    .filter(([_, selected]: [string, boolean]) => {
-                                        return !selected;
+                                options={Object.entries(filterData)
+                                    .filter(([_, type]: [string, FilterType]) => {
+                                        return !type.isActive;
                                     })
-                                    .map(([name, _]: [string, boolean]) => {
+                                    .map(([name, _]: [string, FilterType]) => {
                                         return name;
                                     })}
                                 onClickOption={(_, option: string) => {
-                                    dispatch({ key: option, type: "add" });
+                                    dispatchFilterData({ key: option, type: "add" });
                                 }}
+                                getOptionName={(option: string) => filterData[option].name}
                             >
                                 Filtros
                             </DropdownButton>
                             {/* Selected chips */}
-                            {Object.entries(filters)
-                                .filter(([_, selected]: [string, boolean]) => selected)
-                                .map(([name, _]: [string, boolean]) => {
+                            {Object.entries(filterData)
+                                .filter(([_, type]: [string, FilterType]) => type.isActive)
+                                .map(([name, type]: [string, FilterType]) => {
                                     return (
-                                        <Chip
-                                            variant="outlined"
-                                            label={name}
-                                            onDelete={(_) => dispatch({ key: name, type: "remove" })}
-                                            deleteIcon={<Close sx={{ padding: "0.1rem" }} />}
-                                            size="medium"
-                                            sx={{ padding: "0.25rem" }}
-                                            clickable
+                                        <FilterChip
+                                            label={filterData[name].name}
+                                            onDelete={(_) => {
+                                                dispatchFilterData({ key: name, type: "remove" });
+                                                if (filters[name]) {
+                                                    dispatchFilters({
+                                                        key: name,
+                                                        type: "remove",
+                                                        data: { condition: "<", value: "" },
+                                                    });
+                                                }
+                                            }}
+                                            onClickFilter={(condition, value) => {
+                                                dispatchFilters({
+                                                    key: name,
+                                                    type: "add",
+                                                    data: { condition: condition, value: value },
+                                                });
+                                            }}
+                                            isNumeric={type.isNumeric}
                                             key={name}
-                                        ></Chip>
+                                        ></FilterChip>
                                     );
                                 })}
                         </Grid>
@@ -202,6 +244,13 @@ export default function Home() {
                                     { field: "direccion", headerName: "Dirección", flex: 1, sortable: false },
                                     { field: "puesto", headerName: "Puesto", flex: 0.8, sortable: false },
                                     { field: "pc_cat", headerName: "PC - CAT", flex: 0.8, sortable: false },
+                                    {
+                                        field: "habilitado",
+                                        valueFormatter: (params): string => (params.value ? "Sí" : "No"),
+                                        headerName: "Habilitado",
+                                        flex: 0.8,
+                                        sortable: false,
+                                    },
                                 ]}
                                 rows={dataEmpleados}
                                 getRowId={(row: TableEmpleado) => row.id_empleado}

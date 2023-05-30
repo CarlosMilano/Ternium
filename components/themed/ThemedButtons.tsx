@@ -46,6 +46,7 @@ export interface DropdownButtonProps extends ButtonProps {
      * @returns
      */
     onClickOption: (e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>, option: string) => void;
+    getOptionName?: (option: string) => string;
 }
 /**
  * DropdownButton component.
@@ -56,6 +57,7 @@ export const DropdownButton: React.FC<DropdownButtonProps> = ({
     options,
     instruction,
     onClickOption,
+    getOptionName = (option: string) => option,
     children,
     ...buttonProps
 }): JSX.Element => {
@@ -91,7 +93,7 @@ export const DropdownButton: React.FC<DropdownButtonProps> = ({
                     {options.map((option: string) => (
                         <ListItem disablePadding key={option}>
                             <ListItemButton onClick={(e: MouseEvent<HTMLDivElement>) => onClickOption(e, option)}>
-                                <ListItemText primary={option}></ListItemText>
+                                <ListItemText primary={getOptionName(option)}></ListItemText>
                             </ListItemButton>
                         </ListItem>
                     ))}
