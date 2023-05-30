@@ -111,6 +111,8 @@ export default function Home() {
         },
     ];
 
+    // Fetches the list of employees.
+    // Gets called each time the pagination model is set.
     useEffect(() => {
         console.log(paginationModel);
         const fetchData = async () => {
@@ -145,6 +147,8 @@ export default function Home() {
         fetchData();
     }, [paginationModel]);
 
+    // Resets the pagination model each time the filters change.
+    // Allows the list of employees to be updated.
     useEffect(() => {
         console.log(filters);
         setPaginationModel({
@@ -153,8 +157,21 @@ export default function Home() {
         });
     }, [filters]);
 
-    const onChangeSearch: ChangeEventHandler<HTMLInputElement> = (e: ChangeEvent<HTMLInputElement>) => {
-        setSearch(e.target.value);
+    // Adds or removes a filter to the 'name' column.
+    const handleSubmitSearch: () => void = (): void => {
+        if (search.length > 0) {
+            dispatchFilters({
+                key: "nombre",
+                type: "add",
+                data: { condition: "=", value: search },
+            });
+        } else {
+            dispatchFilters({
+                key: "nombre",
+                type: "remove",
+                data: { condition: "=", value: "" },
+            });
+        }
     };
 
     return (
@@ -183,13 +200,18 @@ export default function Home() {
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <Search></Search>
+                                        <Search />
                                     </InputAdornment>
                                 ),
                             }}
                             fullWidth
                             value={search}
-                            onChange={onChangeSearch}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => setSearch(e.target.value.trimStart())}
+                            onKeyDown={(e) => {
+                                if (e.key !== "Enter") return;
+                                e.preventDefault();
+                                handleSubmitSearch();
+                            }}
                         ></TextField>
                         {/* Filters */}
                         <Grid container gap={1} alignItems="center">
