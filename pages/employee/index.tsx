@@ -37,6 +37,7 @@ import { GetEvaluacionRequestBody } from "../api/getTablaEvaluacion";
 import deepClone from "@/utils/deepClone";
 import { GetTrayectoriaRequestBody } from "../api/getTablaTrayectoria";
 import { useRouter } from "next/router";
+import Navbar from "@/components/Navbar";
 
 type AllData = {
     dataEmpleado: TableEmpleado | null;
@@ -387,7 +388,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
         })
         .reduce((carry: number, charCode: number) => {
             return carry + charCode;
-        })}, 100%, 54%)`;
+        }, 0)}, 100%, 54%)`;
 
     return (
         <>
@@ -396,6 +397,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                 <meta name="description" content="Ficha del empleado" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
             </Head>
+            <Navbar />
             <Box>
                 <Container>
                     <Grid container gap={1} justifyContent="center">
@@ -403,28 +405,6 @@ const EmployeePage: React.FC = (): JSX.Element => {
                         <Grid item xs={12} md={8}>
                             <Paper variant="outlined" sx={{ padding: "1.5rem", height: "100%" }}>
                                 {/* Top section */}
-                                <Stack gap={3} mb={3}>
-                                    <Stack direction="row" gap={2} alignItems="center">
-                                        {/* Avatar */}
-                                        <>
-                                            {dataEmpleado ? (
-                                                <Avatar sx={{ bgcolor: randomColor }}>
-                                                    {dataEmpleado?.nombre?.at(0)?.toUpperCase()}
-                                                </Avatar>
-                                            ) : (
-                                                <Skeleton variant="circular" width={40} height={40} />
-                                            )}
-                                        </>
-                                        {/* Name */}
-                                        <Typography variant="h6" component="h2">
-                                            {dataEmpleado ? (
-                                                dataEmpleado?.nombre?.toUpperCase()
-                                            ) : (
-                                                <Skeleton width={200} />
-                                            )}
-                                        </Typography>
-                                    </Stack>
-                                </Stack>
                                 <EditSection
                                     index={0}
                                     currentIndex={editSectionIndex}
@@ -434,6 +414,42 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                     disabled={dataEmpleado === null}
                                     disableSave={isUpdatingData}
                                 >
+                                    <Stack gap={3} mb={3}>
+                                        <Stack direction="row" gap={2} alignItems="center">
+                                            {/* Avatar */}
+                                            <>
+                                                {dataEmpleado ? (
+                                                    <Avatar sx={{ bgcolor: randomColor }}>
+                                                        {dataEmpleado?.nombre?.at(0)?.toUpperCase()}
+                                                    </Avatar>
+                                                ) : (
+                                                    <Skeleton variant="circular" width={40} height={40} />
+                                                )}
+                                            </>
+                                            {/* Name */}
+                                            <Editable
+                                                sectionIndex={0}
+                                                currentSectionIndex={editSectionIndex}
+                                                inputElement={
+                                                    <TextField
+                                                        value={dataEmpleado?.nombre || ""}
+                                                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                                            updateDataEmpleado("nombre", e.target.value)
+                                                        }
+                                                        sx={{ marginRight: "1rem" }}
+                                                    />
+                                                }
+                                            >
+                                                <Typography variant="h6" component="h2">
+                                                    {dataEmpleado ? (
+                                                        dataEmpleado?.nombre?.toUpperCase()
+                                                    ) : (
+                                                        <Skeleton width={200} />
+                                                    )}
+                                                </Typography>
+                                            </Editable>
+                                        </Stack>
+                                    </Stack>
                                     <Grid container rowGap={2}>
                                         {/* Edad */}
                                         <Grid item md={3} sm={4} xs={6}>
@@ -442,6 +458,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                 value={dataEmpleado?.edad}
                                                 sectionIndex={0}
                                                 currentSectionIndex={editSectionIndex}
+                                                isNumeric
                                                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                                                     updateDataEmpleado("edad", e.target.value)
                                                 }
@@ -458,6 +475,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                 value={dataEmpleado?.antiguedad}
                                                 sectionIndex={0}
                                                 currentSectionIndex={editSectionIndex}
+                                                isNumeric
                                                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                                                     updateDataEmpleado("antiguedad", e.target.value)
                                                 }
@@ -630,6 +648,10 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                                         value={nota || ""}
                                                                         onChange={onChangeNota}
                                                                         size="small"
+                                                                        inputProps={{
+                                                                            inputMode: "numeric",
+                                                                            pattern: "[0-9]*",
+                                                                        }}
                                                                     />
                                                                 );
                                                                 const inputElementComentario: JSX.Element = (
