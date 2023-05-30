@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { Inter } from "next/font/google";
-import { DataGrid, GridPaginationModel } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 import Skeleton from "@mui/material/Skeleton";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
@@ -91,6 +91,25 @@ export default function Home() {
         page: 0,
         pageSize: pageSize,
     });
+
+    // The definition of the columns in the data grid.
+    const columns: GridColDef<TableEmpleado>[] = [
+        { field: "id_empleado", headerName: "ID", flex: 0.1, sortable: false },
+        { field: "nombre", headerName: "Nombre", flex: 1, sortable: false },
+        { field: "antiguedad", headerName: "Antigüedad", flex: 0.8, sortable: false },
+        { field: "universidad", headerName: "Universidad", flex: 1, sortable: false },
+        { field: "area_manager", headerName: "Area Manager", flex: 1, sortable: false },
+        { field: "direccion", headerName: "Dirección", flex: 1, sortable: false },
+        { field: "puesto", headerName: "Puesto", flex: 0.8, sortable: false },
+        { field: "pc_cat", headerName: "PC - CAT", flex: 0.8, sortable: false },
+        {
+            field: "habilitado",
+            valueFormatter: (params): string => (params.value ? "Sí" : "No"),
+            headerName: "Habilitado",
+            flex: 0.8,
+            sortable: false,
+        },
+    ];
 
     useEffect(() => {
         console.log(paginationModel);
@@ -232,30 +251,14 @@ export default function Home() {
                                 })}
                         </Grid>
                     </Stack>
-                    <main>
+                    <main style={md ? { overflowX: "scroll" } : {}}>
                         {dataEmpleados ? (
                             <DataGrid
-                                columns={[
-                                    { field: "id_empleado", headerName: "ID", flex: 0.1, sortable: false },
-                                    { field: "nombre", headerName: "Nombre", flex: 1, sortable: false },
-                                    { field: "antiguedad", headerName: "Antigüedad", flex: 0.8, sortable: false },
-                                    { field: "universidad", headerName: "Universidad", flex: 1, sortable: false },
-                                    { field: "area_manager", headerName: "Area Manager", flex: 1, sortable: false },
-                                    { field: "direccion", headerName: "Dirección", flex: 1, sortable: false },
-                                    { field: "puesto", headerName: "Puesto", flex: 0.8, sortable: false },
-                                    { field: "pc_cat", headerName: "PC - CAT", flex: 0.8, sortable: false },
-                                    {
-                                        field: "habilitado",
-                                        valueFormatter: (params): string => (params.value ? "Sí" : "No"),
-                                        headerName: "Habilitado",
-                                        flex: 0.8,
-                                        sortable: false,
-                                    },
-                                ]}
+                                columns={columns}
                                 rows={dataEmpleados}
                                 getRowId={(row: TableEmpleado) => row.id_empleado}
                                 rowHeight={40}
-                                sx={{ height: 528 }}
+                                sx={md ? { height: 528, width: "200%" } : { height: 528 }}
                                 initialState={{ pagination: { paginationModel: paginationModel } }}
                                 rowSelection={false}
                                 disableColumnMenu
