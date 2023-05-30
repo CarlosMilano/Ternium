@@ -174,11 +174,11 @@ export default function Home() {
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <Navbar sx={{ paddingTop: md ? null : 3 }} />
+            <Navbar />
             <Stack alignItems="center" height="calc(100vh - 128px)">
                 <Stack
                     gap={4}
-                    sx={md ? { width: "100%", paddingInline: "16px" } : { width: "68%", translate: "-4% -64px" }}
+                    sx={md ? { width: "100%", paddingInline: "16px" } : { width: "68%", translate: "-4% -60px" }}
                 >
                     <Stack gap={1}>
                         {/* Search bar */}

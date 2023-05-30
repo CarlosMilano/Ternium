@@ -27,14 +27,15 @@ const Navbar: React.FC<NavbarProps> = ({ variant, elevation, position, color, st
             position="static"
             color="transparent"
             style={{ border: "none" }}
+            sx={{ paddingTop: 2 }}
             {...appBarProps}
         >
             <Toolbar>
-                <Box width={128 / 1.25} height={42 / 1.25} position="relative">
-                    <Link href="/">
-                        <Image src="/assets/imgs/ternium_color.png" alt="Logo de Ternium" fill />
-                    </Link>
-                </Box>
+                <Link href="/">
+                    <Box width={128 / 1.25} height={42 / 1.25} position="relative">
+                        <Image src="/assets/imgs/ternium_color.png" alt="Logo de Ternium" fill sizes="100%" priority />
+                    </Box>
+                </Link>
                 <Box sx={{ flexGrow: 1 }} />
                 <TextButton variant="text" startIcon={<Logout></Logout>} onClick={handleOnClick}>
                     Cerrar Sesión
