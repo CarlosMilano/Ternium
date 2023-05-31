@@ -10,7 +10,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <ThemeProvider theme={muiTheme}>
             <CssBaseline></CssBaseline>
             <UserProvider>
-                <Component {...pageProps} />;
+                <Component {...pageProps} />
             </UserProvider>
         </ThemeProvider>
     );

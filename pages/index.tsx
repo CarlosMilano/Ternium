@@ -1,26 +1,23 @@
 import Head from "next/head";
-import { Inter } from "next/font/google";
-import { DataGrid, GridPaginationModel } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 import Skeleton from "@mui/material/Skeleton";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
-import Chip from "@mui/material/Chip";
 import InputAdornment from "@mui/material/InputAdornment";
 import FilterAltOutlined from "@mui/icons-material/FilterAltOutlined";
-import Close from "@mui/icons-material/Close";
 import Search from "@mui/icons-material/Search";
+import PictureAsPdf from "@mui/icons-material/PictureAsPdf";
+import UploadFile from "@mui/icons-material/UploadFile";
 import Navbar from "@/components/Navbar";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useState, ChangeEventHandler, ChangeEvent, Reducer, Dispatch, useReducer, useEffect } from "react";
+import { useState, ChangeEvent, Reducer, useReducer, useEffect } from "react";
 import { TableEmpleado } from "@/utils/types/dbTables";
 import { useRouter } from "next/router";
-import { DropdownButton } from "@/components/themed/ThemedButtons";
+import { ContainedButton, DropdownButton, OutlinedButton } from "@/components/themed/ThemedButtons";
 import { GetPageEmpleadosRequestBody } from "./api/getPageEmpleados";
 import FilterChip from "@/components/FilterChip";
 import { FilterData, Filters } from "@/utils/types/filters";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
     // The text from the search bar.
@@ -91,9 +88,25 @@ export default function Home() {
         page: 0,
         pageSize: pageSize,
     });
+    // Describes if the employee list is being loaded.
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
+    // The definition of the columns in the data grid.
+    const columns: GridColDef<TableEmpleado>[] = [
+        { field: "id_empleado", headerName: "ID", flex: 0.1, sortable: false },
+        { field: "nombre", headerName: "Nombre", flex: 1, sortable: false },
+        { field: "antiguedad", headerName: "Antigüedad", flex: 0.8, sortable: false },
+        { field: "universidad", headerName: "Universidad", flex: 1, sortable: false },
+        { field: "area_manager", headerName: "Jefe", flex: 1, sortable: false },
+        { field: "direccion", headerName: "Dirección", flex: 1, sortable: false },
+        { field: "puesto", headerName: "Puesto", flex: 0.8, sortable: false },
+        { field: "pc_cat", headerName: "PC - CAT", flex: 0.8, sortable: false },
+    ];
+
+    // Fetches the list of employees.
+    // Gets called each time the pagination model is set.
     useEffect(() => {
-        console.log(paginationModel);
+        setIsLoading(true);
         const fetchData = async () => {
             // Fetch empleados in current page, and the total amount in the query.
             try {
@@ -110,10 +123,9 @@ export default function Home() {
                 if (res.ok) {
                     const [countWrapper, empleados]: [{ count: number }, TableEmpleado[]] = await res.json();
                     const count: number = Number(countWrapper.count);
-                    console.log(count);
-                    console.log(empleados);
                     setAmountOfEmployees(count);
                     setDataEmpleados(empleados);
+                    setIsLoading(false);
                 } else {
                     const error: { error: string } = await res.json();
                     setDataEmpleados([]);
@@ -126,16 +138,30 @@ export default function Home() {
         fetchData();
     }, [paginationModel]);
 
+    // Resets the pagination model each time the filters change.
+    // Allows the list of employees to be updated.
     useEffect(() => {
-        console.log(filters);
         setPaginationModel({
             page: 0,
             pageSize: pageSize,
         });
     }, [filters]);
 
-    const onChangeSearch: ChangeEventHandler<HTMLInputElement> = (e: ChangeEvent<HTMLInputElement>) => {
-        setSearch(e.target.value);
+    // Adds or removes a filter to the 'name' column.
+    const handleSubmitSearch: () => void = (): void => {
+        if (search.length > 0) {
+            dispatchFilters({
+                key: "nombre",
+                type: "add",
+                data: { condition: "=", value: search },
+            });
+        } else {
+            dispatchFilters({
+                key: "nombre",
+                type: "remove",
+                data: { condition: "=", value: "" },
+            });
+        }
     };
 
     return (
@@ -149,11 +175,32 @@ export default function Home() {
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <Navbar sx={{ paddingTop: md ? null : 3 }} />
+            {/* Fixed overlay buttons */}
+            <Stack
+                position="fixed"
+                width="100vw"
+                height="100vh"
+                alignItems="flex-end"
+                justifyContent="flex-end"
+                gap={md ? 1 : 2}
+                padding={md ? "12px" : "24px"}
+            >
+                {!md && (
+                    <OutlinedButton variant="outlined" startIcon={<UploadFile />}>
+                        Subir
+                    </OutlinedButton>
+                )}
+                <ContainedButton variant="contained" startIcon={<PictureAsPdf />}>
+                    Descargar
+                </ContainedButton>
+            </Stack>
+            {/* Navigation Bar */}
+            <Navbar />
+            {/* Main Content */}
             <Stack alignItems="center" height="calc(100vh - 128px)">
                 <Stack
                     gap={4}
-                    sx={md ? { width: "100%", paddingInline: "16px" } : { width: "68%", translate: "-4% -64px" }}
+                    sx={md ? { width: "100%", paddingInline: "16px" } : { width: "68%", translate: "-4% -60px" }}
                 >
                     <Stack gap={1}>
                         {/* Search bar */}
@@ -164,13 +211,18 @@ export default function Home() {
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <Search></Search>
+                                        <Search />
                                     </InputAdornment>
                                 ),
                             }}
                             fullWidth
                             value={search}
-                            onChange={onChangeSearch}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => setSearch(e.target.value.trimStart())}
+                            onKeyDown={(e) => {
+                                if (e.key !== "Enter") return;
+                                e.preventDefault();
+                                handleSubmitSearch();
+                            }}
                         ></TextField>
                         {/* Filters */}
                         <Grid container gap={1} alignItems="center">
@@ -232,30 +284,14 @@ export default function Home() {
                                 })}
                         </Grid>
                     </Stack>
-                    <main>
+                    <main style={md ? { overflowX: "scroll" } : {}}>
                         {dataEmpleados ? (
                             <DataGrid
-                                columns={[
-                                    { field: "id_empleado", headerName: "ID", flex: 0.1, sortable: false },
-                                    { field: "nombre", headerName: "Nombre", flex: 1, sortable: false },
-                                    { field: "antiguedad", headerName: "Antigüedad", flex: 0.8, sortable: false },
-                                    { field: "universidad", headerName: "Universidad", flex: 1, sortable: false },
-                                    { field: "area_manager", headerName: "Area Manager", flex: 1, sortable: false },
-                                    { field: "direccion", headerName: "Dirección", flex: 1, sortable: false },
-                                    { field: "puesto", headerName: "Puesto", flex: 0.8, sortable: false },
-                                    { field: "pc_cat", headerName: "PC - CAT", flex: 0.8, sortable: false },
-                                    {
-                                        field: "habilitado",
-                                        valueFormatter: (params): string => (params.value ? "Sí" : "No"),
-                                        headerName: "Habilitado",
-                                        flex: 0.8,
-                                        sortable: false,
-                                    },
-                                ]}
+                                columns={columns}
                                 rows={dataEmpleados}
                                 getRowId={(row: TableEmpleado) => row.id_empleado}
                                 rowHeight={40}
-                                sx={{ height: 528 }}
+                                sx={md ? { height: 528, width: "200%" } : { height: 528 }}
                                 initialState={{ pagination: { paginationModel: paginationModel } }}
                                 rowSelection={false}
                                 disableColumnMenu
@@ -264,6 +300,7 @@ export default function Home() {
                                 pageSizeOptions={[10]}
                                 rowCount={amountOfEmployees}
                                 paginationModel={paginationModel}
+                                loading={isLoading}
                                 onPaginationModelChange={setPaginationModel}
                                 onRowClick={({ id }) => router.push(`/employee?id=${id}`)}
                             />

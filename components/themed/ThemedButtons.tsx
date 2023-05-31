@@ -9,11 +9,21 @@ import { useState, useEffect, MouseEvent } from "react";
 
 /**
  * A styled wrapper of the Button component.
+ * Used for Buttons with variant 'contained'.
+ */
+export const ContainedButton = styled(Button)(({ theme }) => {
+    return {
+        paddingBlock: "0.5rem",
+    };
+});
+
+/**
+ * A styled wrapper of the Button component.
  * Used for Buttons with variant 'outlined'.
  */
 export const OutlinedButton = styled(Button)(({ theme }) => {
     return {
-        borderColor: theme.colors.rojoTernium,
+        borderColor: "#B3B3B3",
         paddingBlock: "0.5rem",
     };
 });
