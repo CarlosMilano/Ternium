@@ -6,6 +6,7 @@ import Head from "next/head";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import Paper from "@mui/material/Paper";
+import PictureAsPdf from "@mui/icons-material/PictureAsPdf";
 import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -38,6 +39,10 @@ import deepClone from "@/utils/deepClone";
 import { GetTrayectoriaRequestBody } from "../api/getTablaTrayectoria";
 import { useRouter } from "next/router";
 import Navbar from "@/components/Navbar";
+import { ContainedButton } from "@/components/themed/ThemedButtons";
+import PdfEmployee from "@/utils/pdf/PdfEmployee";
+import { BlobProvider } from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
 
 type AllData = {
     dataEmpleado: TableEmpleado | null;
@@ -397,10 +402,12 @@ const EmployeePage: React.FC = (): JSX.Element => {
                 <meta name="description" content="Ficha del empleado" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
             </Head>
+            {/* Navigation Bar */}
             <Navbar />
+            {/* Emplyoee sheet */}
             <Box>
                 <Container>
-                    <Grid container gap={1} justifyContent="center">
+                    <Grid container gap={1} justifyContent="center" paddingBottom={8}>
                         {/* Left card */}
                         <Grid item xs={12} md={8}>
                             <Paper variant="outlined" sx={{ padding: "1.5rem", height: "100%" }}>
@@ -858,6 +865,11 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                     arr: TableEvaluacion[]
                                                 ) => {
                                                     const isLast: boolean = index === arr.length - 1;
+                                                    const onChangePerformance: ChangeEventHandler<HTMLInputElement> = (
+                                                        e: ChangeEvent<HTMLInputElement>
+                                                    ) => {
+                                                        updateDataEvaluacion(`${index}.performance`, e.target.value);
+                                                    };
                                                     const onChangePotencial: ChangeEventHandler<HTMLInputElement> = (
                                                         e: ChangeEvent<HTMLInputElement>
                                                     ) => {
@@ -869,80 +881,63 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                         updateDataEvaluacion(`${index}.curva`, e.target.value);
                                                     };
                                                     return (
-                                                        <Stack direction="row" gap={1} key={id_evaluacion}>
-                                                            {/* Performace */}
-                                                            <Stack direction="column" pt={2}>
-                                                                <div style={{ height: "100%" }}>
-                                                                    <Avatar
-                                                                        sx={{
-                                                                            bgcolor: "gold",
-                                                                            color: "black",
-                                                                            width: 32,
-                                                                            height: 32,
-                                                                            fontSize: 16,
-                                                                            mt: 2,
-                                                                        }}
-                                                                    >
-                                                                        {performance ? (performance % 3) + 2 : 4}
-                                                                    </Avatar>
-                                                                    <div
-                                                                        hidden={isLast}
-                                                                        style={{
-                                                                            backgroundColor: "lightgray",
-                                                                            width: 1,
-                                                                            height: "100%",
-                                                                            margin: "auto",
-                                                                        }}
-                                                                    ></div>
-                                                                </div>
-                                                            </Stack>
-                                                            {/* Information */}
-                                                            <List sx={{ width: "100%" }}>
-                                                                <ListItem
-                                                                    sx={{
-                                                                        flexDirection: "column",
-                                                                        alignItems: "flex-start",
-                                                                    }}
+                                                        <List sx={{ width: "100%" }} key={id_evaluacion}>
+                                                            <ListItem
+                                                                sx={{
+                                                                    flexDirection: "column",
+                                                                    alignItems: "flex-start",
+                                                                }}
+                                                            >
+                                                                {/* Año */}
+                                                                <Typography
+                                                                    variant="body1"
+                                                                    component="p"
+                                                                    textAlign="end"
+                                                                    width="100%"
+                                                                    color="grey"
                                                                 >
-                                                                    {/* Año */}
-                                                                    <Typography
-                                                                        variant="body1"
-                                                                        component="p"
-                                                                        textAlign="end"
-                                                                        width="100%"
-                                                                        color="grey"
-                                                                    >
-                                                                        {año}
+                                                                    {año}
+                                                                </Typography>
+                                                                {/* Performance */}
+                                                                <LabelledField
+                                                                    label="Performance"
+                                                                    value={performance}
+                                                                    sectionIndex={3}
+                                                                    currentSectionIndex={editSectionIndex}
+                                                                    onChange={onChangePerformance}
+                                                                >
+                                                                    <Typography variant="body1" component="p">
+                                                                        {performance}
                                                                     </Typography>
-                                                                    {/* Potencial */}
-                                                                    <LabelledField
-                                                                        label="Potencial"
-                                                                        value={potencial}
-                                                                        sectionIndex={3}
-                                                                        currentSectionIndex={editSectionIndex}
-                                                                        onChange={onChangePotencial}
-                                                                    >
-                                                                        <Typography variant="body1" component="p">
-                                                                            {potencial && potencial > 3
-                                                                                ? "AP (MT)"
-                                                                                : "PROM (M)"}
-                                                                        </Typography>
-                                                                    </LabelledField>
-                                                                    {/* Curva */}
-                                                                    <LabelledField
-                                                                        label="Curva"
-                                                                        value={curva}
-                                                                        sectionIndex={3}
-                                                                        currentSectionIndex={editSectionIndex}
-                                                                        onChange={onChangeCurva}
-                                                                    >
-                                                                        <Typography variant="body1" component="p">
-                                                                            {curva}
-                                                                        </Typography>
-                                                                    </LabelledField>
-                                                                </ListItem>
-                                                            </List>
-                                                        </Stack>
+                                                                </LabelledField>
+                                                                {/* Potencial */}
+                                                                <LabelledField
+                                                                    label="Potencial"
+                                                                    value={potencial}
+                                                                    sectionIndex={3}
+                                                                    currentSectionIndex={editSectionIndex}
+                                                                    onChange={onChangePotencial}
+                                                                >
+                                                                    <Typography variant="body1" component="p">
+                                                                        {potencial && potencial > 3
+                                                                            ? "AP (MT)"
+                                                                            : "PROM (M)"}
+                                                                    </Typography>
+                                                                </LabelledField>
+                                                                {/* Curva */}
+                                                                <LabelledField
+                                                                    label="Curva"
+                                                                    value={curva}
+                                                                    sectionIndex={3}
+                                                                    currentSectionIndex={editSectionIndex}
+                                                                    onChange={onChangeCurva}
+                                                                >
+                                                                    <Typography variant="body1" component="p">
+                                                                        {curva}
+                                                                    </Typography>
+                                                                </LabelledField>
+                                                            </ListItem>
+                                                        </List>
                                                     );
                                                 }
                                             )
@@ -1045,6 +1040,45 @@ const EmployeePage: React.FC = (): JSX.Element => {
                     </Grid>
                 </Container>
             </Box>
+            {/* Fixed overlay buttons */}
+            <Stack position="fixed" bottom={0} right={0} padding="24px">
+                <BlobProvider
+                    document={
+                        <PdfEmployee
+                            empleado={dataEmpleado}
+                            comentarios={dataComentarios}
+                            resumenes={dataResumen}
+                            evaluaciones={dataEvaluacion}
+                            trayectorias={dataTrayectoria}
+                        />
+                    }
+                >
+                    {({ blob, url, loading, error }) => {
+                        return (
+                            <ContainedButton
+                                variant="contained"
+                                startIcon={<PictureAsPdf />}
+                                disabled={
+                                    dataEmpleado === null ||
+                                    dataComentarios === null ||
+                                    dataResumen === null ||
+                                    dataEvaluacion === null ||
+                                    dataTrayectoria === null ||
+                                    loading ||
+                                    error !== null
+                                }
+                                onClick={() => {
+                                    if (blob) {
+                                        saveAs(blob, `${dataEmpleado?.nombre}_ficha.pdf`);
+                                    }
+                                }}
+                            >
+                                Descargar
+                            </ContainedButton>
+                        );
+                    }}
+                </BlobProvider>
+            </Stack>
         </>
     );
 };
