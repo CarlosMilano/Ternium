@@ -19,8 +19,8 @@ export default async function getPageEmpleados(
     let client: PoolClient | null = null;
     const createAND = (name: string, filter: FilterData | null, isString: boolean = true) => {
         if (!filter) return "";
-        const value: string = isString ? `'${filter.value}'` : `${filter.value}`;
-        return ` AND ${name} ${filter.condition} ${value} `;
+        const value: string = isString ? `LIKE LOWER('${filter.value}%')` : `${filter.condition} ${filter.value}`;
+        return ` AND LOWER(${name}) ${value} `;
     };
     try {
         client = (await pool.connect()) as PoolClient;
@@ -57,6 +57,8 @@ export default async function getPageEmpleados(
             LIMIT ${pageSize}
             OFFSET ${page * pageSize}
         `;
+
+        // console.log(query);
 
         const countResult: QueryResult = await client.query(countQuery);
         const count: number = countResult.rows[0];
