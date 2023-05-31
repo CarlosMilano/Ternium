@@ -20,7 +20,7 @@ export default async function getPageEmpleados(
     const createAND = (name: string, filter: FilterData | null, isString: boolean = true) => {
         if (!filter) return "";
         return isString
-            ? `AND LOWER (${name}) LIKE LOWER('${filter.value}%') `
+            ? `AND LOWER (${name}) LIKE LOWER('%${filter.value}%') `
             : `AND ${name} ${filter.condition} ${filter.value} `;
     };
     try {
