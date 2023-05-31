@@ -6,6 +6,7 @@ import Head from "next/head";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import Paper from "@mui/material/Paper";
+import PictureAsPdf from "@mui/icons-material/PictureAsPdf";
 import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -38,6 +39,10 @@ import deepClone from "@/utils/deepClone";
 import { GetTrayectoriaRequestBody } from "../api/getTablaTrayectoria";
 import { useRouter } from "next/router";
 import Navbar from "@/components/Navbar";
+import { ContainedButton } from "@/components/themed/ThemedButtons";
+import PdfEmployee from "@/utils/pdf/PdfEmployee";
+import { BlobProvider } from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
 
 type AllData = {
     dataEmpleado: TableEmpleado | null;
@@ -397,6 +402,53 @@ const EmployeePage: React.FC = (): JSX.Element => {
                 <meta name="description" content="Ficha del empleado" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
             </Head>
+            {/* Fixed overlay buttons */}
+            <Stack
+                position="fixed"
+                width="100vw"
+                height="100vh"
+                alignItems="flex-end"
+                justifyContent="flex-end"
+                padding="24px"
+            >
+                <BlobProvider
+                    document={
+                        <PdfEmployee
+                            empleado={dataEmpleado}
+                            comentarios={dataComentarios}
+                            resumenes={dataResumen}
+                            evaluaciones={dataEvaluacion}
+                            trayectorias={dataTrayectoria}
+                        />
+                    }
+                >
+                    {({ blob, url, loading, error }) => {
+                        return (
+                            <ContainedButton
+                                variant="contained"
+                                startIcon={<PictureAsPdf />}
+                                disabled={
+                                    dataEmpleado === null ||
+                                    dataComentarios === null ||
+                                    dataResumen === null ||
+                                    dataEvaluacion === null ||
+                                    dataTrayectoria === null ||
+                                    loading ||
+                                    error !== null
+                                }
+                                onClick={() => {
+                                    if (blob) {
+                                        saveAs(blob, `${dataEmpleado?.nombre}_ficha.pdf`);
+                                    }
+                                }}
+                            >
+                                Descargar
+                            </ContainedButton>
+                        );
+                    }}
+                </BlobProvider>
+            </Stack>
+            {/* Navigation Bar */}
             <Navbar />
             <Box>
                 <Container>
