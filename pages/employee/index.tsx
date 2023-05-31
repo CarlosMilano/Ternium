@@ -7,6 +7,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import Paper from "@mui/material/Paper";
 import PictureAsPdf from "@mui/icons-material/PictureAsPdf";
+import ArrowBack from "@mui/icons-material/ArrowBack";
 import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -39,10 +40,11 @@ import deepClone from "@/utils/deepClone";
 import { GetTrayectoriaRequestBody } from "../api/getTablaTrayectoria";
 import { useRouter } from "next/router";
 import Navbar from "@/components/Navbar";
-import { ContainedButton } from "@/components/themed/ThemedButtons";
+import { ContainedButton, TextButton } from "@/components/themed/ThemedButtons";
 import PdfEmployee from "@/utils/pdf/PdfEmployee";
 import { BlobProvider } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
+import Link from "next/link";
 
 type AllData = {
     dataEmpleado: TableEmpleado | null;
@@ -404,13 +406,13 @@ const EmployeePage: React.FC = (): JSX.Element => {
             </Head>
             {/* Navigation Bar */}
             <Navbar />
-            {/* Emplyoee sheet */}
+            {/* Employee sheet */}
             <Box>
                 <Container>
                     <Grid container gap={1} justifyContent="center" paddingBottom={8}>
                         {/* Left card */}
                         <Grid item xs={12} md={8}>
-                            <Paper variant="outlined" sx={{ padding: "1.5rem", height: "100%" }}>
+                            <Paper variant="outlined" sx={{ padding: "1.5rem", paddingTop: "1rem", height: "100%" }}>
                                 {/* Top section */}
                                 <EditSection
                                     index={0}
@@ -421,7 +423,14 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                     disabled={dataEmpleado === null}
                                     disableSave={isUpdatingData}
                                 >
-                                    <Stack gap={3} mb={3}>
+                                    <Stack gap={2} mb={3}>
+                                        <Stack direction="row">
+                                            <Link href="/">
+                                                <TextButton variant="text" startIcon={<ArrowBack />}>
+                                                    Volver
+                                                </TextButton>
+                                            </Link>
+                                        </Stack>
                                         <Stack direction="row" gap={2} alignItems="center">
                                             {/* Avatar */}
                                             <>
