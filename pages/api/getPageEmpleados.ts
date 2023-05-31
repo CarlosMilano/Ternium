@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             direccion || null,
             puesto || null,
             pc_cat || null,
-            null,
+            habilitado || null
         );
 
         res.status(200).json([count, employees]);

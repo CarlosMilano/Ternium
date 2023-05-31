@@ -8,12 +8,13 @@ import { DropdownSelect } from "./themed/ThemedSelects";
 import { OutlinedButton } from "./themed/ThemedButtons";
 import { FilterConditionals } from "@/utils/types/filters";
 
+type FilterChipState = "disabled" | "saved" | "unsaved";
+
 interface FilterChipProps extends ChipProps {
-    isNumeric?: boolean;
+    type: "string" | "number" | "boolean";
     onClickFilter: (condition: FilterConditionals, value: string) => void;
 }
-
-const FilterChip: React.FC<FilterChipProps> = ({ isNumeric, onClickFilter, label, ...chipProps }): JSX.Element => {
+const FilterChip: React.FC<FilterChipProps> = ({ type, onClickFilter, label, ...chipProps }): JSX.Element => {
     // The button element that displays the dropdown.
     // Null if the dropdown is hidden.
     const [anchorChip, setAnchorChip] = useState<HTMLDivElement | null>(null);
@@ -21,26 +22,33 @@ const FilterChip: React.FC<FilterChipProps> = ({ isNumeric, onClickFilter, label
     const [conditional, setConditional] = useState<string>("");
     // The current value to be compared.
     const [value, setValue] = useState<string>("");
-    // Current selected combination.
-    const [selectedCombination, setSelectCombination] = useState<string>("");
-    // True if the chip was saved correctly.
-    const isSaved: boolean = selectedCombination.length > 0;
+    // The saved values after pressing the filter button.
+    const [savedData, setSavedData] = useState<{ condition: string; value: string } | null>(null);
     // Temporary random string to set as ID.
     const randomID: string = new Date().toDateString();
+    // The current state of the chip, according to its values.
+    const state: FilterChipState =
+        savedData === null && conditional === "" && value === ""
+            ? "disabled"
+            : savedData === null || savedData.condition !== conditional || savedData.value !== value
+            ? "unsaved"
+            : "saved";
 
     const handleSubmitFilter: FormEventHandler<HTMLFormElement> = (e: FormEvent<HTMLFormElement>): void => {
         e.preventDefault();
         const condition: FilterConditionals | null =
-            !isNumeric || conditional === "Igual a"
+            type === "string" || type === "boolean" || conditional === "Igual a"
                 ? "="
                 : conditional === "Menor a"
                 ? "<"
                 : conditional === "Mayor a"
                 ? ">"
                 : null;
-        if (condition && value.length !== 0) {
-            onClickFilter(condition, value);
-            setSelectCombination(`${conditional} ${value}`);
+        const newValue: string =
+            type !== "boolean" ? value : value === "Activo" ? "true" : value === "Inactivo" ? "false" : "";
+        if (condition && newValue.length !== 0) {
+            onClickFilter(condition, newValue);
+            setSavedData({ condition: conditional, value: value });
         } else {
             console.log("Filter unfinished!");
         }
@@ -50,8 +58,9 @@ const FilterChip: React.FC<FilterChipProps> = ({ isNumeric, onClickFilter, label
         <>
             <Chip
                 variant="outlined"
-                label={isSaved ? `${label}: ${selectedCombination}` : label}
-                color={isSaved ? "primary" : "default"}
+                label={savedData ? `${label}: ${savedData.condition} ${savedData.value}` : label}
+                color={state === "disabled" ? "default" : state === "unsaved" ? "warning" : "primary"}
+                style={state === "disabled" ? { color: "grey" } : {}}
                 deleteIcon={<Close sx={{ padding: "0.1rem" }} />}
                 size="medium"
                 sx={{ padding: "0.25rem" }}
@@ -67,7 +76,7 @@ const FilterChip: React.FC<FilterChipProps> = ({ isNumeric, onClickFilter, label
             >
                 <form onSubmit={handleSubmitFilter}>
                     <Stack gap={2} sx={{ padding: 2 }}>
-                        {isNumeric && (
+                        {type === "number" && (
                             <DropdownSelect
                                 id={randomID}
                                 label="Condición"
@@ -79,14 +88,28 @@ const FilterChip: React.FC<FilterChipProps> = ({ isNumeric, onClickFilter, label
                                 sx={{ width: 240 }}
                             />
                         )}
-                        <TextField
-                            label="Valor"
-                            value={value}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
-                            sx={{ width: 240 }}
-                            required
-                            inputProps={isNumeric ? { inputMode: "numeric", pattern: "[0-9]*" } : {}}
-                        />
+                        {(type === "string" || type === "number") && (
+                            <TextField
+                                label="Valor"
+                                value={value}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
+                                sx={{ width: 240 }}
+                                required
+                                inputProps={type === "number" ? { inputMode: "numeric", pattern: "[0-9]*" } : {}}
+                            />
+                        )}
+                        {type === "boolean" && (
+                            <DropdownSelect
+                                id={`${label}-value`}
+                                label="Selecciona"
+                                labelId={`${label}-label`}
+                                onChange={(e) => setValue(e.target.value as string)}
+                                options={["Activo", "Inactivo"]}
+                                value={value}
+                                required
+                                sx={{ width: 240 }}
+                            />
+                        )}
                         <Stack direction="row" justifyContent="end">
                             <OutlinedButton type="submit">Filtrar</OutlinedButton>
                         </Stack>

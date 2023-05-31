@@ -29,7 +29,7 @@ export default function Home() {
     // The state of the filters.
     type FilterType = {
         name: string;
-        isNumeric: boolean;
+        type: "string" | "number" | "boolean";
         isActive: boolean;
     };
     type FilterDataState = {
@@ -50,13 +50,13 @@ export default function Home() {
         }
     };
     const [filterData, dispatchFilterData] = useReducer<Reducer<FilterDataState, FilterDataAction>>(filterDataReducer, {
-        antiguedad: { name: "Antigüedad", isNumeric: true, isActive: false },
-        universidad: { name: "Universidad", isNumeric: false, isActive: false },
-        area_manager: { name: "Jefe", isNumeric: false, isActive: false },
-        direccion: { name: "Dirección", isNumeric: false, isActive: false },
-        puesto: { name: "Puesto", isNumeric: false, isActive: false },
-        pc_cat: { name: "PC - CAT", isNumeric: false, isActive: false },
-        habilitado: { name: "Habilitado", isNumeric: false, isActive: false },
+        antiguedad: { name: "Antigüedad", type: "number", isActive: false },
+        universidad: { name: "Universidad", type: "string", isActive: false },
+        area_manager: { name: "Jefe", type: "string", isActive: false },
+        direccion: { name: "Dirección", type: "string", isActive: false },
+        puesto: { name: "Puesto", type: "string", isActive: false },
+        pc_cat: { name: "PC - CAT", type: "string", isActive: false },
+        habilitado: { name: "Habilitado", type: "boolean", isActive: false },
     });
     // The selected filters
     type FiltersAction = { key: string; type: "add" | "remove"; data: FilterData };
@@ -141,6 +141,7 @@ export default function Home() {
     // Resets the pagination model each time the filters change.
     // Allows the list of employees to be updated.
     useEffect(() => {
+        console.log(filters);
         setPaginationModel({
             page: 0,
             pageSize: pageSize,
@@ -277,7 +278,7 @@ export default function Home() {
                                                     data: { condition: condition, value: value },
                                                 });
                                             }}
-                                            isNumeric={type.isNumeric}
+                                            type={type.type}
                                             key={name}
                                         ></FilterChip>
                                     );
