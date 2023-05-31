@@ -138,7 +138,7 @@ const PdfEmployee: React.FC<PdfEmployeeProps> = ({
                     {/*          Table Rows */}
                     {resumenes?.map((resumen: TableResumen) => {
                         return (
-                            <View style={styles.sectionSummaryRow}>
+                            <View style={styles.sectionSummaryRow} key={resumen.id_resumen}>
                                 <Text style={{ ...styles.text }}>{resumen.resumen_perfil}</Text>
                             </View>
                         );
@@ -150,7 +150,7 @@ const PdfEmployee: React.FC<PdfEmployeeProps> = ({
                     {/*          Table Rows */}
                     {evaluaciones?.map((evaluacion: TableEvaluacion) => {
                         return (
-                            <View style={styles.sectionEvaluation}>
+                            <View style={styles.sectionEvaluation} key={evaluacion.id_evaluacion}>
                                 <Text style={{ ...styles.subtitle, textAlign: "right" }}>{evaluacion.año}</Text>
                                 <View style={styles.sectionEvaluationTable}>
                                     <View>
@@ -174,7 +174,7 @@ const PdfEmployee: React.FC<PdfEmployeeProps> = ({
                     {/*          Table Rows */}
                     {trayectorias?.map((trayectoria: TableTrayectoria) => {
                         return (
-                            <View style={styles.sectionEvaluation}>
+                            <View style={styles.sectionEvaluation} key={trayectoria.id_trayectoria}>
                                 <View style={styles.sectionEvaluationTable}>
                                     <View>
                                         <Text style={styles.subtitle}>Empresa</Text>
