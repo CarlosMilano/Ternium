@@ -43,11 +43,6 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
-  /**
-   * This gets executed each time useState user changes state.
-   *      i.e. everytime the user logs in/out, or enters the site.
-   * This code won't do anything until the first onAuthStateChanged happens.
-   */
   useEffect(() => {
     if (user === null) {
       if (router.pathname !== "/login") router.push("/login");
@@ -55,12 +50,6 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
       if (router.pathname === "/login") router.push("/");
     }
   }, [user]);
-
-  // useEffect(() => {
-  //     console.log(router.pathname);
-  //     if (router.pathname !== "/login" && !user) router.push("/login");
-  //     if (router.pathname === "/login" && user) router.push("/search");
-  // }, [router.pathname]);
 
   return (
     <UserContext.Provider

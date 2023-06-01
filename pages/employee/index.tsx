@@ -3,11 +3,14 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Head from "next/head";
+import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import Paper from "@mui/material/Paper";
 import PictureAsPdf from "@mui/icons-material/PictureAsPdf";
+import Delete from "@mui/icons-material/Delete";
 import ArrowBack from "@mui/icons-material/ArrowBack";
+import PersonOff from "@mui/icons-material/PersonOff";
 import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -21,7 +24,16 @@ import TableRow from "@mui/material/TableRow";
 import TabPanel from "@/components/employee/TabPanel";
 import Tabs from "@mui/material/Tabs";
 import EditSection, { EditEventHandler, Editable } from "@/components/employee/EditSection";
-import { ChangeEvent, ChangeEventHandler, FormEvent, FormEventHandler, MouseEvent, useEffect, useState } from "react";
+import {
+    ChangeEvent,
+    ChangeEventHandler,
+    FormEvent,
+    FormEventHandler,
+    MouseEvent,
+    useEffect,
+    useState,
+    MouseEventHandler,
+} from "react";
 import useObjectState from "@/utils/hooks/useObjectState";
 import {
     TableComentarios,
@@ -45,6 +57,8 @@ import PdfEmployee from "@/utils/pdf/PdfEmployee";
 import { BlobProvider } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import Link from "next/link";
+import { useMediaQuery } from "@mui/material";
+import DialogDisable from "@/components/employee/DialogDisable";
 
 type AllData = {
     dataEmpleado: TableEmpleado | null;
@@ -87,7 +101,10 @@ const EmployeePage: React.FC = (): JSX.Element => {
     // True if the page is doing a POST of updated data.
     // Determines if publish buttons should be disabled.
     const [isUpdatingData, setIsUpdatingData] = useState<boolean>(false);
+    // Determines if the disable/enable/delete dialog is opened.
+    const [isDisableDialogOpened, setIsDisableDialogOpened] = useState<boolean>(false);
 
+    const md: boolean = useMediaQuery("(max-width: 900px)");
     const router = useRouter();
 
     // Data fetching.
@@ -203,12 +220,12 @@ const EmployeePage: React.FC = (): JSX.Element => {
         const { id } = router.query;
         // Early return if no id is specified.
         if (id === undefined) {
-            router.push("/search");
+            router.push("/");
             return;
         }
         const idEmpleado: number = Number(id);
         fetchData(idEmpleado);
-    }, []);
+    });
 
     function resetData(setDataFunction: Function, value: any): void {
         setDataFunction(value ? deepClone(value) : value);
@@ -387,6 +404,68 @@ const EmployeePage: React.FC = (): JSX.Element => {
         });
     };
 
+    const handleOnToggleEnabled: (enabled: boolean) => void = async (enabled) => {
+        if (dataEmpleado == null) return;
+        const habilitadoData: TableEmpleado = { id_empleado: dataEmpleado.id_empleado, habilitado: enabled };
+        console.log(habilitadoData);
+        try {
+            const res = await fetch("/api/updateEmpleadoHabilitado", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(habilitadoData),
+            });
+            updateFetchedData("dataEmpleado.habilitado", enabled);
+            updateDataEmpleado("habilitado", enabled);
+        } catch (err) {
+            console.error("Error updating habilitado from employee.");
+        }
+    };
+    const handleOnDelete: () => void = async () => {
+        if (dataEmpleado == null) return;
+        const deleteData: TableEmpleado = { id_empleado: dataEmpleado.id_empleado };
+        try {
+            const res = await fetch("/api/deleteEmpleado", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(deleteData),
+            });
+            router.push("/");
+        } catch (err) {
+            console.error("Error updating habilitado from employee.");
+        }
+    };
+
+    const handleOnClickDeleteComentario: (id_comentario: number) => void = async (id_comentario) => {
+        if (dataEmpleado == null || dataComentarios == null) return;
+        setIsUpdatingData(true);
+        const comentarioData: TableComentarios = {
+            id_empleado: dataEmpleado.id_empleado,
+            id_comentario: id_comentario,
+        };
+        try {
+            const res = await fetch("/api/deleteComentario", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(comentarioData),
+            });
+            const updatedComments: TableComentarios[] = dataComentarios.filter((comentario: TableComentarios) => {
+                return comentario.id_comentario !== id_comentario;
+            });
+            setDataComentarios(updatedComments);
+            updateFetchedData("dataComentarios", updatedComments);
+        } catch (err) {
+            console.error(`Error deleting comment with id ${id_comentario}.`);
+        } finally {
+            setIsUpdatingData(false);
+        }
+    };
+
     // Generates a color for the employee's avatar, based on their name.
     const randomColor: string = `hsl(${dataEmpleado?.nombre
         ?.split("")
@@ -424,12 +503,20 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                     disableSave={isUpdatingData}
                                 >
                                     <Stack gap={2} mb={3}>
-                                        <Stack direction="row">
+                                        <Stack direction="row" justifyContent="space-between">
                                             <Link href="/">
                                                 <TextButton variant="text" startIcon={<ArrowBack />}>
                                                     Volver
                                                 </TextButton>
                                             </Link>
+                                            <TextButton
+                                                variant="text"
+                                                startIcon={<PersonOff />}
+                                                onClick={() => setIsDisableDialogOpened(true)}
+                                                disabled={dataEmpleado == null}
+                                            >
+                                                {dataEmpleado?.habilitado ? "Deshabilitar" : "Habilitar"}
+                                            </TextButton>
                                         </Stack>
                                         <Stack direction="row" gap={2} alignItems="center">
                                             {/* Avatar */}
@@ -633,6 +720,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                     <TableRow>
                                                         <TableCell align="center">Nota</TableCell>
                                                         <TableCell>Comentarios</TableCell>
+                                                        {editSectionIndex === 1 && <TableCell />}
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
@@ -699,6 +787,23 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                                                 {comentario}
                                                                             </Editable>
                                                                         </TableCell>
+                                                                        {editSectionIndex === 1 && (
+                                                                            <TableCell
+                                                                                align="center"
+                                                                                sx={{ width: 50 }}
+                                                                            >
+                                                                                <IconButton
+                                                                                    size={md ? "small" : "large"}
+                                                                                    onClick={() =>
+                                                                                        handleOnClickDeleteComentario(
+                                                                                            id_comentario
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    <Delete />
+                                                                                </IconButton>
+                                                                            </TableCell>
+                                                                        )}
                                                                     </TableRow>
                                                                 );
                                                             }
@@ -1088,6 +1193,16 @@ const EmployeePage: React.FC = (): JSX.Element => {
                     }}
                 </BlobProvider>
             </Stack>
+            {/* Dialogs */}
+            <DialogDisable
+                open={isDisableDialogOpened}
+                employeeIsEnabled={dataEmpleado?.habilitado}
+                onClose={() => setIsDisableDialogOpened(false)}
+                onToggleEnabled={handleOnToggleEnabled}
+                onDelete={handleOnDelete}
+                name={dataEmpleado?.nombre}
+                fullWidth
+            ></DialogDisable>
         </>
     );
 };
