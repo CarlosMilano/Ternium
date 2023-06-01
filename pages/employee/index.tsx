@@ -392,6 +392,41 @@ const EmployeePage: React.FC = (): JSX.Element => {
         });
     };
 
+    const handleOnToggleEnabled: (enabled: boolean) => void = async (enabled) => {
+        if (dataEmpleado == null) return;
+        const habilitadoData: TableEmpleado = { id_empleado: dataEmpleado.id_empleado, habilitado: enabled };
+        console.log(habilitadoData);
+        try {
+            const res = await fetch("/api/updateEmpleadoHabilitado", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(habilitadoData),
+            });
+            updateFetchedData("dataEmpleado.habilitado", enabled);
+            updateDataEmpleado("habilitado", enabled);
+        } catch (err) {
+            console.error("Error updating habilitado from employee.");
+        }
+    };
+    const handleOnDelete: () => void = async () => {
+        if (dataEmpleado == null) return;
+        const deleteData: TableEmpleado = { id_empleado: dataEmpleado.id_empleado };
+        try {
+            const res = await fetch("/api/deleteEmpleado", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(deleteData),
+            });
+            router.push("/");
+        } catch (err) {
+            console.error("Error updating habilitado from employee.");
+        }
+    };
+
     // Generates a color for the employee's avatar, based on their name.
     const randomColor: string = `hsl(${dataEmpleado?.nombre
         ?.split("")
@@ -439,8 +474,9 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                 variant="text"
                                                 startIcon={<PersonOff />}
                                                 onClick={() => setIsDisableDialogOpened(true)}
+                                                disabled={dataEmpleado == null}
                                             >
-                                                Deshabilitar
+                                                {dataEmpleado?.habilitado ? "Deshabilitar" : "Habilitar"}
                                             </TextButton>
                                         </Stack>
                                         <Stack direction="row" gap={2} alignItems="center">
@@ -1103,9 +1139,10 @@ const EmployeePage: React.FC = (): JSX.Element => {
             {/* Dialogs */}
             <DialogDisable
                 open={isDisableDialogOpened}
+                employeeIsEnabled={dataEmpleado?.habilitado}
                 onClose={() => setIsDisableDialogOpened(false)}
-                onDisable={() => {}}
-                onDelete={() => {}}
+                onToggleEnabled={handleOnToggleEnabled}
+                onDelete={handleOnDelete}
                 name={dataEmpleado?.nombre}
                 fullWidth
             ></DialogDisable>
