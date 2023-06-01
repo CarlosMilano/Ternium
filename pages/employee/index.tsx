@@ -8,6 +8,7 @@ import ListItem from "@mui/material/ListItem";
 import Paper from "@mui/material/Paper";
 import PictureAsPdf from "@mui/icons-material/PictureAsPdf";
 import ArrowBack from "@mui/icons-material/ArrowBack";
+import PersonOff from "@mui/icons-material/PersonOff";
 import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -45,6 +46,8 @@ import PdfEmployee from "@/utils/pdf/PdfEmployee";
 import { BlobProvider } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import Link from "next/link";
+import { useMediaQuery } from "@mui/material";
+import DialogDisable from "@/components/employee/DialogDisable";
 
 type AllData = {
     dataEmpleado: TableEmpleado | null;
@@ -87,6 +90,8 @@ const EmployeePage: React.FC = (): JSX.Element => {
     // True if the page is doing a POST of updated data.
     // Determines if publish buttons should be disabled.
     const [isUpdatingData, setIsUpdatingData] = useState<boolean>(false);
+    // Determines if the disable/enable/delete dialog is opened.
+    const [isDisableDialogOpened, setIsDisableDialogOpened] = useState<boolean>(false);
 
     const router = useRouter();
 
@@ -203,7 +208,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
         const { id } = router.query;
         // Early return if no id is specified.
         if (id === undefined) {
-            router.push("/search");
+            router.push("/");
             return;
         }
         const idEmpleado: number = Number(id);
@@ -424,12 +429,19 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                     disableSave={isUpdatingData}
                                 >
                                     <Stack gap={2} mb={3}>
-                                        <Stack direction="row">
+                                        <Stack direction="row" justifyContent="space-between">
                                             <Link href="/">
                                                 <TextButton variant="text" startIcon={<ArrowBack />}>
                                                     Volver
                                                 </TextButton>
                                             </Link>
+                                            <TextButton
+                                                variant="text"
+                                                startIcon={<PersonOff />}
+                                                onClick={() => setIsDisableDialogOpened(true)}
+                                            >
+                                                Deshabilitar
+                                            </TextButton>
                                         </Stack>
                                         <Stack direction="row" gap={2} alignItems="center">
                                             {/* Avatar */}
@@ -1088,6 +1100,15 @@ const EmployeePage: React.FC = (): JSX.Element => {
                     }}
                 </BlobProvider>
             </Stack>
+            {/* Dialogs */}
+            <DialogDisable
+                open={isDisableDialogOpened}
+                onClose={() => setIsDisableDialogOpened(false)}
+                onDisable={() => {}}
+                onDelete={() => {}}
+                name={dataEmpleado?.nombre}
+                fullWidth
+            ></DialogDisable>
         </>
     );
 };
