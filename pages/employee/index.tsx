@@ -225,7 +225,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
         }
         const idEmpleado: number = Number(id);
         fetchData(idEmpleado);
-    }, []);
+    });
 
     function resetData(setDataFunction: Function, value: any): void {
         setDataFunction(value ? deepClone(value) : value);

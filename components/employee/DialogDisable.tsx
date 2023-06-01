@@ -7,7 +7,7 @@ import Tab from "@mui/material/Tab";
 import DialogActions from "@mui/material/DialogActions";
 import { TextButton } from "../themed/ThemedButtons";
 import Button from "@mui/material/Button";
-import { useState, ChangeEvent, MouseEventHandler, MouseEvent } from "react";
+import { useState, ChangeEvent, MouseEventHandler } from "react";
 import TabPanel from "./TabPanel";
 import Divider from "@mui/material/Divider";
 import TextField from "@mui/material/TextField";
@@ -96,7 +96,7 @@ const DialogDisable: React.FC<DialogDisableProps> = ({
                 <Divider />
                 <DialogContent>
                     <DialogContentText>
-                        Para confimar, escribe <b>"{employeeName}"</b> debajo:
+                        Para confimar, escribe <b>{`\"${employeeName}\"`}</b> debajo:
                     </DialogContentText>
                     <TextField
                         value={confirmName}
