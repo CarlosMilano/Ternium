@@ -22,11 +22,12 @@ import terniumLogo from "../../public/assets/imgs/ternium_color.png";
 import React, { useEffect, useState } from "react";
 import { auth } from "@/config/environment/firebase";
 import { DataGrid } from "@mui/x-data-grid";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { TableEmpleado } from "@/utils/types/dbTables";
 import { themeColors } from "@/config/theme";
 import { useRouter } from "next/router";
 import { useUser } from "@/providers/user";
+import * as admin from "firebase-admin";
 
 function Search() {
   const [dataEmpleados, setDataEmpleados] = useState<TableEmpleado[]>([]);
@@ -46,6 +47,15 @@ function Search() {
       }
     });
   }, []);
+
+  //   admin.initializeApp();
+
+  //   const setCustomClaims = async (email: string) => {
+  //     const user = await admin.auth().getUserByEmail(email);
+  //     admin.auth().setCustomUserClaims(user.uid, {
+  //       role: "admin",
+  //     });
+  //   };
 
   useState(() => {
     const fetchData = async () => {
@@ -92,8 +102,26 @@ function Search() {
       });
   };
 
+  //   const handleSetCustomClaims = () => {
+  //     axios
+  //       .post("/api/setCustomClaims", { email: "" }) // Agrega el correo electrónico aquí
+  //       .then((response) => {
+  //         console.log(response.data);
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error setting custom claims:", error);
+  //         handleClickSnack();
+  //       });
+  //   };
+
   return (
     <Box sx={{ bgcolor: "white", height: "100vh", width: "100%" }}>
+      {/* <button
+        style={{ position: "fixed", bottom: "50px", left: "50px" }}
+        onClick={handleSetCustomClaims}
+      >
+        Set custom claims
+      </button> */}
       {/* <button onClick={handleClickSnack}>Hola</button> */}
       <Snackbar
         open={openSnack}
