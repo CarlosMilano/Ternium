@@ -44,12 +44,6 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
         }
     }, [user]);
 
-    // useEffect(() => {
-    //     console.log(router.pathname);
-    //     if (router.pathname !== "/login" && !user) router.push("/login");
-    //     if (router.pathname === "/login" && user) router.push("/search");
-    // }, [router.pathname]);
-
     return (
         <UserContext.Provider
             value={{
