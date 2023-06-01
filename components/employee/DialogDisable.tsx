@@ -15,13 +15,15 @@ import { themeColors } from "@/config/theme";
 
 interface DialogDisableProps extends DialogProps {
     name: string | undefined;
-    onDisable: () => void;
+    employeeIsEnabled: boolean | undefined;
+    onToggleEnabled: (enable: boolean) => void;
     onDelete: () => void;
 }
 
 const DialogDisable: React.FC<DialogDisableProps> = ({
     name,
-    onDisable,
+    employeeIsEnabled,
+    onToggleEnabled,
     onDelete,
     onClose,
     ...dialogProps
@@ -29,6 +31,7 @@ const DialogDisable: React.FC<DialogDisableProps> = ({
     const [tabIndex, setTabIndex] = useState<number>(0);
     const [confirmName, setConfirmName] = useState<string>("");
     const employeeName: string = name ? name : "Empleado sin nombre";
+    const isEnabled: boolean = employeeIsEnabled === undefined ? false : employeeIsEnabled;
 
     // Wrapper for the onClose callback function.
     // Resets the Dialog's values.
@@ -39,8 +42,8 @@ const DialogDisable: React.FC<DialogDisableProps> = ({
             onClose({}, "backdropClick");
         }
     };
-    const handleOnClickDisable: MouseEventHandler<HTMLButtonElement> = () => {
-        onDisable();
+    const handleOnClickToggleEnabled: MouseEventHandler<HTMLButtonElement> = () => {
+        onToggleEnabled(!isEnabled);
         closeDialog();
     };
     const handleOnClickDelete: MouseEventHandler<HTMLButtonElement> = () => {
@@ -63,10 +66,10 @@ const DialogDisable: React.FC<DialogDisableProps> = ({
             </Tabs>
             {/* Enable/Disable section */}
             <TabPanel currentIndex={tabIndex} index={0}>
-                <DialogTitle>Deshabilitar empleado</DialogTitle>
+                <DialogTitle>{isEnabled ? "Deshabilitar" : "Habilitar"} empleado</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Estás a punto de deshabilitar al empleado{" "}
+                        Estás a punto de {isEnabled ? "deshabilitar" : "habilitar"} al empleado{" "}
                         <span style={{ color: themeColors.celesteTernium }}>{employeeName}</span>. Esta acción puede
                         deshacerse en cualquier momento. ¿Estás seguro?
                     </DialogContentText>
@@ -75,8 +78,8 @@ const DialogDisable: React.FC<DialogDisableProps> = ({
                     <TextButton variant="text" onClick={() => closeDialog()}>
                         Cancelar
                     </TextButton>
-                    <Button onClick={handleOnClickDisable} autoFocus>
-                        Deshabilitar
+                    <Button onClick={handleOnClickToggleEnabled} autoFocus>
+                        {isEnabled ? "Deshabilitar" : "Habilitar"}
                     </Button>
                 </DialogActions>
             </TabPanel>
