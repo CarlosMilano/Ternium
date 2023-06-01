@@ -3,10 +3,12 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Head from "next/head";
+import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import Paper from "@mui/material/Paper";
 import PictureAsPdf from "@mui/icons-material/PictureAsPdf";
+import Delete from "@mui/icons-material/Delete";
 import ArrowBack from "@mui/icons-material/ArrowBack";
 import PersonOff from "@mui/icons-material/PersonOff";
 import Skeleton from "@mui/material/Skeleton";
@@ -22,7 +24,16 @@ import TableRow from "@mui/material/TableRow";
 import TabPanel from "@/components/employee/TabPanel";
 import Tabs from "@mui/material/Tabs";
 import EditSection, { EditEventHandler, Editable } from "@/components/employee/EditSection";
-import { ChangeEvent, ChangeEventHandler, FormEvent, FormEventHandler, MouseEvent, useEffect, useState } from "react";
+import {
+    ChangeEvent,
+    ChangeEventHandler,
+    FormEvent,
+    FormEventHandler,
+    MouseEvent,
+    useEffect,
+    useState,
+    MouseEventHandler,
+} from "react";
 import useObjectState from "@/utils/hooks/useObjectState";
 import {
     TableComentarios,
@@ -93,6 +104,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
     // Determines if the disable/enable/delete dialog is opened.
     const [isDisableDialogOpened, setIsDisableDialogOpened] = useState<boolean>(false);
 
+    const md: boolean = useMediaQuery("(max-width: 900px)");
     const router = useRouter();
 
     // Data fetching.
@@ -427,6 +439,33 @@ const EmployeePage: React.FC = (): JSX.Element => {
         }
     };
 
+    const handleOnClickDeleteComentario: (id_comentario: number) => void = async (id_comentario) => {
+        if (dataEmpleado == null || dataComentarios == null) return;
+        setIsUpdatingData(true);
+        const comentarioData: TableComentarios = {
+            id_empleado: dataEmpleado.id_empleado,
+            id_comentario: id_comentario,
+        };
+        try {
+            const res = await fetch("/api/deleteComentario", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(comentarioData),
+            });
+            const updatedComments: TableComentarios[] = dataComentarios.filter((comentario: TableComentarios) => {
+                return comentario.id_comentario !== id_comentario;
+            });
+            setDataComentarios(updatedComments);
+            updateFetchedData("dataComentarios", updatedComments);
+        } catch (err) {
+            console.error(`Error deleting comment with id ${id_comentario}.`);
+        } finally {
+            setIsUpdatingData(false);
+        }
+    };
+
     // Generates a color for the employee's avatar, based on their name.
     const randomColor: string = `hsl(${dataEmpleado?.nombre
         ?.split("")
@@ -681,6 +720,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                     <TableRow>
                                                         <TableCell align="center">Nota</TableCell>
                                                         <TableCell>Comentarios</TableCell>
+                                                        {editSectionIndex === 1 && <TableCell />}
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
@@ -747,6 +787,23 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                                                 {comentario}
                                                                             </Editable>
                                                                         </TableCell>
+                                                                        {editSectionIndex === 1 && (
+                                                                            <TableCell
+                                                                                align="center"
+                                                                                sx={{ width: 50 }}
+                                                                            >
+                                                                                <IconButton
+                                                                                    size={md ? "small" : "large"}
+                                                                                    onClick={() =>
+                                                                                        handleOnClickDeleteComentario(
+                                                                                            id_comentario
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    <Delete />
+                                                                                </IconButton>
+                                                                            </TableCell>
+                                                                        )}
                                                                     </TableRow>
                                                                 );
                                                             }
