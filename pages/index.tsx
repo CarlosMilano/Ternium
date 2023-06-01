@@ -187,7 +187,9 @@ export default function Home() {
                 padding={md ? "12px" : "24px"}
             >
                 {!md && (
-                    <OutlinedButton variant="outlined" startIcon={<UploadFile />}>
+                    <OutlinedButton onClick={() => {
+                        fetch("/api/load-csv")
+                    }} variant="outlined" startIcon={<UploadFile />}>
                         Subir
                     </OutlinedButton>
                 )}
