@@ -31,6 +31,9 @@ export const muiTheme: Theme = createTheme({
         primary: {
             main: themeColors.celesteTernium,
         },
+        secondary: {
+            main: themeColors.rojoTernium,
+        },
     },
     colors: {
         rojoTernium: "#ff3300",
