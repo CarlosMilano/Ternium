@@ -9,7 +9,7 @@
   * [Filtros de Busqueda](#filtros-de-busqueda)
   * [Visualizacion de Ficha de Empleado](#visualizacion-de-ficha-de-empleado)
   * [Edicion de Datos](#edicion-de-datos)
-  * [Deshabilitacion/Eliminacion de Empleados](#deshabilitacion/eliminacion-de-empleados)
+  * [Deshabilitacion/Eliminacion de Empleados](#deshabilitacioneliminacion-de-empleados)
   * [Descarga de Ficha en PDF](#descarga-de-ficha-en-pdf)
 * [Run the Project](#run-the-project)
 * [Contact](#contact)
@@ -30,31 +30,31 @@ Una herramienta web para monitorear un histórico de performance y experiencia l
 
 ### Login
 
-<img src="https://github.com/Erick2929/Ternium/assets/110145796/85ad89d0-6d70-482e-8ae8-67afaf5186c3" width="75%" />
+<img src="https://github.com/Erick2929/Ternium/assets/110145796/33419d1f-7abd-4c37-b871-c45538235cc6" width="75%" />
 
 ### Visualizacion de Empleados
 
-<img src="https://github.com/Erick2929/Ternium/assets/110145796/a5010347-bf8e-423d-84ef-354d44f5cdb5" width="75%" />
+<img src="https://github.com/Erick2929/Ternium/assets/110145796/6083c2e8-4c20-424f-955a-1b90008ee8f1" width="75%" />
 
 ### Filtros de Busqueda
 
-<img src="https://github.com/Erick2929/Ternium/assets/110145796/2c316947-6fa0-4467-8412-e6e9aa21ce9e" width="75%" />
+<img src="https://github.com/Erick2929/Ternium/assets/110145796/b058fb19-2c38-4e47-ba9e-ddfb7ed4f5a2" width="75%" />
 
 ### Visualizacion de Ficha de Empleado
 
-<img src="https://github.com/Erick2929/Ternium/assets/110145796/a78db233-29d7-4abd-9e9e-0374f65b421d" width="75%" />
+<img src="https://github.com/Erick2929/Ternium/assets/110145796/e9bdb8d6-8e2a-413e-bc44-f909f1b7bf57" width="75%" />
 
 ### Edicion de Datos
 
-<img src="https://github.com/Erick2929/Ternium/assets/110145796/9c3f48f7-00a5-4393-a4df-1ba8fcba83b1" width="75%" />
+<img src="https://github.com/Erick2929/Ternium/assets/110145796/4308d984-cd4f-4ca3-8324-1bc1baa3191e" width="75%" />
 
 ### Deshabilitacion/Eliminacion de Empleados
 
-<img src="https://github.com/Erick2929/Ternium/assets/110145796/ab37ed3e-bfbb-4edf-b6e2-066fd4193498" width="75%" />
+<img src="https://github.com/Erick2929/Ternium/assets/110145796/7e21bd49-655d-4fed-b0a7-515b20aa1d70" width="75%" />
 
 ### Descarga de Ficha en PDF
 
-<img src="https://github.com/Erick2929/Ternium/assets/110145796/cdb6517b-2815-4a88-b1fb-f5c1e674a1e6" width="75%" />
+<img src="https://github.com/Erick2929/Ternium/assets/110145796/4d6852c1-482b-4199-b163-f04f8b988795" width="75%" />
 
 <!-- RUN THE PROJECT -->
 ## Run the Project
