@@ -1,0 +1,6 @@
+id_empleado,nombre,edad,antiguedad,universidad,area_manager,direccion,puesto,pc_cat,habilitado,fecha_nacimiento,cet,idm4
+80,nombre50,29,3,uni,jefe,direc,puest,pc,true,17/01/00,fjsjjsl,4444
+81,nombre50,29,3,uni,jefe,direc,puest,pc,true,18/01/00,fjsjjsl,4444
+82,nombre50,29,3,uni,jefe,direc,puest,pc,true,19/01/00,fjsjjsl,4444
+83,nombre50,29,3,uni,jefe,direc,puest,pc,true,20/01/00,fjsjjsl,4444
+84,nombre50,29,3,uni,jefe,direc,puest,pc,true,21/01/00,fjsjjsl,4444
