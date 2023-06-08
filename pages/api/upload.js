@@ -41,6 +41,9 @@ export default function handler(req, res) {
               });
             } else {
               const insertPromises = results.map((row) => {
+
+                // Tabla Empleado
+
                 const {
                   id_empleado,
                   nombre,
@@ -57,8 +60,8 @@ export default function handler(req, res) {
                   idm4
                 } = row;
 
-                const query = 'INSERT INTO empleado(id_empleado, nombre, edad, antiguedad, universidad, area_manager, direccion, puesto, pc_cat, habilitado, fecha_nacimiento, cet, idm4) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)';
-                const values = [
+                const empleadoQuery = 'INSERT INTO empleado(id_empleado, nombre, edad, antiguedad, universidad, area_manager, direccion, puesto, pc_cat, habilitado, fecha_nacimiento, cet, idm4) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)';
+                const empleadoValues = [
                   id_empleado,
                   nombre,
                   edad,
@@ -74,9 +77,86 @@ export default function handler(req, res) {
                   idm4
                 ];
 
+                // Tabla Evaluacion
 
+                const {
+                  id_evaluacion,
+                  año,
+                  performance,
+                  potencial,
+                  curva
+                } = row;
 
-                return client.query(query, values)
+                const evaluacionQuery = "INSERT INTO evaluacion(id_evaluacion, año, performance, potencial, curva, id_empleado) VALUES($1, $2, $3, $4, $5, $6)";
+                const evaluacionValues = [
+                  id_evaluacion,
+                  año,
+                  performance,
+                  potencial,
+                  curva,
+                  id_empleado
+                ];
+
+                // Tabla Resumen
+
+                const {
+                  id_resumen,
+                  resumen_perfil
+                } = row;
+
+                const resumenQuery = "INSERT INTO resumen(id_resumen, resumen_perfil, id_empleado) VALUES($1, $2, $3)";
+                const resumenValues = [
+                  id_resumen,
+                  resumen_perfil,
+                  id_empleado
+                ];
+
+                // Tabla Comentario
+
+                const {
+                  id_comentario,
+                  nota,
+                  promedio_notas,
+                  comentario
+                } = row;
+
+                const comentarioQuery = "INSERT INTO comentarios(id_comentario, nota, promedio_notas, comentario, id_empleado) VALUES($1, $2, $3, $4, $5)";
+                const comentarioValues = [
+                  id_comentario,
+                  nota,
+                  promedio_notas,
+                  comentario,
+                  id_empleado
+                ];
+
+                // Tabla Trayectoria
+
+                const {
+                  id_trayectoria,
+                  empresa,
+                  fecha_inicio,
+                  fecha_fin
+                } = row;
+
+                const trayectoriaQuery = "INSERT INTO trayectoria(id_trayectoria, empresa, puesto, id_empleado, fecha_inicio, fecha_fin) VALUES($1, $2, $3, $4, $5, $6)";
+                const trayectoriaValues = [
+                  id_trayectoria,
+                  empresa,
+                  puesto,
+                  id_empleado,
+                  fecha_inicio,
+                  fecha_fin
+                ];
+
+                const promises = [
+                  client.query(empleadoQuery, empleadoValues),
+                  client.query(evaluacionQuery, evaluacionValues),
+                  client.query(resumenQuery, resumenValues),
+                  client.query(comentarioQuery, comentarioValues),
+                  client.query(trayectoriaQuery, trayectoriaValues),
+                ];
+
+                return Promise.all(promises)
                   .catch((err) => {
                     console.error('Error al insertar el registro:', err);
                     client.query('ROLLBACK');
