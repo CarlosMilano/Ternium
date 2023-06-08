@@ -1,9 +1,7 @@
 import multer from 'multer';
 import csv from 'csv-parser';
 import fs from 'fs';
-import dbConfig from './dbConfig';
-
-const pool = dbConfig.default;
+import  pool  from './dbConfig';
 
 const upload = multer({ dest: 'public/uploads/' });
 
@@ -12,8 +10,6 @@ export const config = {
     bodyParser: false,
   },
 };
-
-
 
 export default function handler(req, res) {
   upload.single('file')(req, res, (err) => {
@@ -31,9 +27,6 @@ export default function handler(req, res) {
         results.push(data);
       })
       .on('end', () => {
-        // Insertar los datos en la base de datos
-        const query = 'INSERT INTO empleado(id_empleado, nombre, edad, antiguedad, universidad, area_manager, direccion, puesto, pc_cat, habilitado, fecha_nacimiento, cet, idm4) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)';
-
         pool.connect((err, client, done) => {
           if (err) {
             console.error(err);
@@ -48,7 +41,41 @@ export default function handler(req, res) {
               });
             } else {
               const insertPromises = results.map((row) => {
-                const values = Object.values(row);
+                const {
+                  id_empleado,
+                  nombre,
+                  edad,
+                  antiguedad,
+                  universidad,
+                  area_manager,
+                  direccion,
+                  puesto,
+                  pc_cat,
+                  habilitado,
+                  fecha_nacimiento,
+                  cet,
+                  idm4
+                } = row;
+
+                const query = 'INSERT INTO empleado(id_empleado, nombre, edad, antiguedad, universidad, area_manager, direccion, puesto, pc_cat, habilitado, fecha_nacimiento, cet, idm4) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)';
+                const values = [
+                  id_empleado,
+                  nombre,
+                  edad,
+                  antiguedad,
+                  universidad,
+                  area_manager,
+                  direccion,
+                  puesto,
+                  pc_cat,
+                  habilitado,
+                  fecha_nacimiento,
+                  cet,
+                  idm4
+                ];
+
+
+
                 return client.query(query, values)
                   .catch((err) => {
                     console.error('Error al insertar el registro:', err);

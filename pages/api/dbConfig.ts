@@ -7,5 +7,4 @@ const pool = new Pool({
   },
 });
 
-export { pool as default };
-
+export default  pool ;
