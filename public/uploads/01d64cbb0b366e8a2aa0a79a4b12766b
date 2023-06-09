@@ -1,0 +1,6 @@
+id_empleado,nombre,edad,antiguedad,universidad,area_manager,direccion,puesto,pc_cat,habilitado,fecha_nacimiento,cet,idm4,id_evaluacion,a–o,performance,potencial,curva,id_resumen,resumen_perfil,id_comentario ,nota,promedio_notas ,comentario,id_trayectoria,empresa,puesto,fecha_inicio,fecha_fin
+118,nombre50,29,3,uni,jefe,direc,puest,pc,true,17/01/00,fjsjjsl,hola,118,2020,4,5,hsdj,118,Comentario,118,2,4,Comentario,118,Sof,jefe,17/01/00,17/01/00
+119,nombre50,29,3,uni,jefe,direc,puest,pc,true,18/01/00,dsfsd,como,119,2020,3,5,asd,119,Comentario,119,2,4,Comentario,119,Sof,jefe,18/01/00,18/01/00
+120,nombre50,29,3,uni,jefe,direc,puest,pc,true,19/01/00,gfgb,estas,120,2020,2,5,gtr,120,Comentario,120,2,4,Comentario,120,Sof,jefe,19/01/00,19/01/00
+121,nombre50,29,3,uni,jefe,direc,puest,pc,true,20/01/00,adfag,agregate,121,2020,3,5,vefd,121,Comentario,121,2,4,Comentario,121,Sof,jefe,20/01/00,20/01/00
+122,nombre50,29,3,uni,jefe,direc,puest,pc,true,21/01/00,wergb,paro,122,2020,3,5,oeo,122,Comentario,122,2,4,Comentario,122,Sof,jefe,21/01/00,21/01/00

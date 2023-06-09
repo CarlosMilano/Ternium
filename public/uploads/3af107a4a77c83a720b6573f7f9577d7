@@ -1,0 +1,6 @@
+id_empleado,nombre,edad,antiguedad,universidad,area_manager,direccion,puesto,pc_cat,habilitado,fecha_nacimiento,cet,idm4
+90,nombre50,29,3,uni,jefe,direc,puest,pc,true,17/01/00,fjsjjsl,hola
+91,nombre50,29,3,uni,jefe,direc,puest,pc,true,18/01/00,dsfsd,como
+92,nombre50,29,3,uni,jefe,direc,puest,pc,true,19/01/00,gfgb,estas
+93,nombre50,29,3,uni,jefe,direc,puest,pc,true,20/01/00,adfag,agregate
+94,nombre50,29,3,uni,jefe,direc,puest,pc,true,21/01/00,wergb,paro

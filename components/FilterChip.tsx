@@ -49,8 +49,6 @@ const FilterChip: React.FC<FilterChipProps> = ({ type, onClickFilter, label, ...
         if (condition && newValue.length !== 0) {
             onClickFilter(condition, newValue);
             setSavedData({ condition: conditional, value: value });
-        } else {
-            console.log("Filter unfinished!");
         }
     };
 

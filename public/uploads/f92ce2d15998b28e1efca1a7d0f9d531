@@ -1,0 +1,6 @@
+id_empleado,nombre,edad,antiguedad,universidad,area_manager,direccion,puesto,pc_cat,habilitado,fecha_nacimiento,cet,idm4,id_evaluacion,a–o,performance,potencial,curva
+110,nombre50,29,3,uni,jefe,direc,puest,pc,true,17/01/00,fjsjjsl,hola,110,2020,4,5,hsdj
+111,nombre50,29,3,uni,jefe,direc,puest,pc,true,18/01/00,dsfsd,como,111,2020,3,5,asd
+112,nombre50,29,3,uni,jefe,direc,puest,pc,true,19/01/00,gfgb,estas,112,2020,2,5,gtr
+113,nombre50,29,3,uni,jefe,direc,puest,pc,true,20/01/00,adfag,agregate,113,2020,3,5,vefd
+114,nombre50,29,3,uni,jefe,direc,puest,pc,true,21/01/00,wergb,paro,114,2020,3,5,oeo

@@ -79,17 +79,6 @@ const Login = () => {
     const [wrongPassword, setWrongPassword] = useState<boolean>(false);
     const { user } = useUser();
 
-    // useEffect(() => {
-    //     const unsubscribe: Unsubscribe = auth.onAuthStateChanged((user: User | null) => {
-    //         if (user) {
-    //             console.log(user);
-    //         } else {
-    //             console.log("%cLa sesión no está iniciada.", "color: yellow;");
-    //         }
-    //     });
-    //     return () => unsubscribe();
-    // }, []);
-
     const handleOnSubmit: FormEventHandler<HTMLFormElement> = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
         try {
