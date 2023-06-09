@@ -1,3 +1,4 @@
+import axios from "axios";
 import Head from "next/head";
 import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 import Skeleton from "@mui/material/Skeleton";
@@ -11,7 +12,16 @@ import PictureAsPdf from "@mui/icons-material/PictureAsPdf";
 import UploadFile from "@mui/icons-material/UploadFile";
 import Navbar from "@/components/Navbar";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useState, ChangeEvent, Reducer, useReducer, useEffect } from "react";
+import {
+    useState,
+    ChangeEvent,
+    Reducer,
+    useReducer,
+    useEffect,
+    useRef,
+    MutableRefObject,
+    ChangeEventHandler,
+} from "react";
 import { TableEmpleado } from "@/utils/types/dbTables";
 import { useRouter } from "next/router";
 import { ContainedButton, DropdownButton, OutlinedButton } from "@/components/themed/ThemedButtons";
@@ -26,6 +36,8 @@ export default function Home() {
     const [dataEmpleados, setDataEmpleados] = useState<TableEmpleado[] | null>(null);
     // The total amount of employees. (Currently, the index of the last employee)
     const [amountOfEmployees, setAmountOfEmployees] = useState<number>(0);
+    // A reference to the Input button that actually uploads the user's file.
+    const refInputFile: MutableRefObject<HTMLInputElement | null> = useRef<HTMLInputElement | null>(null);
     // The state of the filters.
     type FilterType = {
         name: string;
@@ -165,6 +177,23 @@ export default function Home() {
         }
     };
 
+    // Uploads the .csv file uploaded by the user.
+    const handleFileUpload: ChangeEventHandler<HTMLInputElement> = (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files === null || e.target.files.length === 0) return;
+        const csvFile: File = e.target.files[0];
+        const formData = new FormData();
+        formData.append("file", csvFile);
+
+        axios
+            .post("/api/upload", formData)
+            .then((res) => {
+                console.log(res.data);
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    };
+
     return (
         <>
             <Head>
@@ -187,11 +216,26 @@ export default function Home() {
                 padding={md ? "12px" : "24px"}
             >
                 {!md && (
-                    <OutlinedButton onClick={() => {
-                        fetch("/api/load-csv")
-                    }} variant="outlined" startIcon={<UploadFile />}>
-                        Subir
-                    </OutlinedButton>
+                    <>
+                        <OutlinedButton
+                            variant="outlined"
+                            startIcon={<UploadFile />}
+                            type="button"
+                            onClick={() => {
+                                if (refInputFile === null || refInputFile.current === null) return;
+                                refInputFile.current.click();
+                            }}
+                        >
+                            Subir
+                        </OutlinedButton>
+                        <input
+                            ref={refInputFile}
+                            type="file"
+                            style={{ display: "none" }}
+                            onChange={handleFileUpload}
+                            accept=".csv"
+                        />
+                    </>
                 )}
                 <ContainedButton variant="contained" startIcon={<PictureAsPdf />}>
                     Descargar
