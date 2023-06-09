@@ -19,6 +19,16 @@ export default async function getPageEmpleados(
     let client: PoolClient | null = null;
     const createAND = (name: string, filter: FilterData | null, isString: boolean = true) => {
         if (!filter) return "";
+        if (name === "nombre") {
+            return `
+                AND (
+                    LOWER (nombre) LIKE LOWER('%${filter.value}%') 
+                    OR id_empleado = ${Number.isNaN(Number(filter.value)) ? -1 : Number(filter.value)} 
+                    OR cet = '${filter.value}' 
+                    OR idm4 = '${filter.value}'
+                ) 
+            `;
+        }
         return isString
             ? `AND LOWER (${name}) LIKE LOWER('%${filter.value}%') `
             : `AND ${name} ${filter.condition} ${filter.value} `;
