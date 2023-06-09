@@ -116,13 +116,14 @@ export default function Home() {
     // The definition of the columns in the data grid.
     const columns: GridColDef<TableEmpleado>[] = [
         { field: "id_empleado", headerName: "ID", flex: 0.1, sortable: false },
-        { field: "nombre", headerName: "Nombre", flex: 1, sortable: false },
-        { field: "antiguedad", headerName: "Antigüedad", flex: 0.8, sortable: false },
-        { field: "universidad", headerName: "Universidad", flex: 1, sortable: false },
-        { field: "area_manager", headerName: "Jefe", flex: 1, sortable: false },
-        { field: "direccion", headerName: "Dirección", flex: 1, sortable: false },
-        { field: "puesto", headerName: "Puesto", flex: 0.8, sortable: false },
-        { field: "pc_cat", headerName: "PC - CAT", flex: 0.8, sortable: false },
+        { field: "cet", headerName: "CET", flex: 0.5, minWidth: 80, sortable: false },
+        { field: "idm4", headerName: "IDM4", flex: 0.5, minWidth: 80, sortable: false },
+        { field: "nombre", headerName: "Nombre", flex: 1.4, minWidth: 160, sortable: false },
+        { field: "antiguedad", headerName: "Antigüedad", flex: 0.6, minWidth: 80, sortable: false },
+        { field: "area_manager", headerName: "Jefe", flex: 1, minWidth: 120, sortable: false },
+        { field: "direccion", headerName: "Dirección", flex: 0.8, minWidth: 100, sortable: false },
+        { field: "puesto", headerName: "Puesto", flex: 0.8, minWidth: 100, sortable: false },
+        { field: "pc_cat", headerName: "PC - CAT", flex: 0.6, minWidth: 80, sortable: false },
     ];
 
     // Fetches the list of employees.
@@ -355,7 +356,7 @@ export default function Home() {
                         <TextField
                             variant="filled"
                             hiddenLabel
-                            placeholder="Buscar"
+                            placeholder="Nombre, ID, CET, IDM4..."
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
