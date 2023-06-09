@@ -1,4 +1,4 @@
-import { Document, Page, View, Text, StyleSheet, Font } from "@react-pdf/renderer";
+import { Document, Page, View, Text, StyleSheet, Font, Image } from "@react-pdf/renderer";
 import { TableComentarios, TableEmpleado, TableEvaluacion, TableResumen, TableTrayectoria } from "../types/dbTables";
 
 Font.register({ family: "Roboto-Regular", src: "/Roboto-Regular.ttf" });
@@ -60,24 +60,22 @@ const PdfEmployee: React.FC<PdfEmployeeProps> = ({
         <Document>
             <Page size="A4" style={styles.page}>
                 <View style={styles.paper}>
+                    {/* Logo TERNIUM */}
+                    <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
+                        <Text style={styles.title}>{empleado?.nombre || "N/A"}</Text>
+                        <Image src="/assets/imgs/ternium_color.png" style={{ width: 90, height: 30 }} />
+                    </View>
                     {/* Nombre */}
-                    <Text style={styles.title}>{empleado?.nombre || "N/A"}</Text>
                     {/* SECCIÓN: Información */}
                     <View style={styles.sectionInformation}>
                         <View style={styles.sectionInformationColumn}>
                             <View>
+                                <Text style={styles.subtitle}>ID</Text>
+                                <Text style={styles.text}>{empleado?.id_empleado || "N/A"}</Text>
+                            </View>
+                            <View>
                                 <Text style={styles.subtitle}>Edad</Text>
                                 <Text style={styles.text}>{empleado?.edad || "N/A"}</Text>
-                            </View>
-                            <View>
-                                <Text style={styles.subtitle}>Area Manager</Text>
-                                <Text style={styles.text}>{empleado?.area_manager || "N/A"}</Text>
-                            </View>
-                        </View>
-                        <View style={styles.sectionInformationColumn}>
-                            <View>
-                                <Text style={styles.subtitle}>Antigüedad</Text>
-                                <Text style={styles.text}>{empleado?.antiguedad || "N/A"}</Text>
                             </View>
                             <View>
                                 <Text style={styles.subtitle}>Dirección</Text>
@@ -86,8 +84,12 @@ const PdfEmployee: React.FC<PdfEmployeeProps> = ({
                         </View>
                         <View style={styles.sectionInformationColumn}>
                             <View>
-                                <Text style={styles.subtitle}>Estudios</Text>
-                                <Text style={styles.text}>{empleado?.estudios || "N/A"}</Text>
+                                <Text style={styles.subtitle}>CET</Text>
+                                <Text style={styles.text}>{empleado?.cet || "N/A"}</Text>
+                            </View>
+                            <View>
+                                <Text style={styles.subtitle}>Antigüedad</Text>
+                                <Text style={styles.text}>{empleado?.antiguedad || "N/A"}</Text>
                             </View>
                             <View>
                                 <Text style={styles.subtitle}>Puesto</Text>
@@ -96,12 +98,26 @@ const PdfEmployee: React.FC<PdfEmployeeProps> = ({
                         </View>
                         <View style={styles.sectionInformationColumn}>
                             <View>
+                                <Text style={styles.subtitle}>IDM4</Text>
+                                <Text style={styles.text}>{empleado?.idm4 || "N/A"}</Text>
+                            </View>
+                            <View>
                                 <Text style={styles.subtitle}>Universidad</Text>
                                 <Text style={styles.text}>{empleado?.universidad || "N/A"}</Text>
                             </View>
                             <View>
                                 <Text style={styles.subtitle}>PC - CAT</Text>
                                 <Text style={styles.text}>{empleado?.pc_cat || "N/A"}</Text>
+                            </View>
+                        </View>
+                        <View style={styles.sectionInformationColumn}>
+                            <View>
+                                <Text style={styles.subtitle}>.</Text>
+                                <Text style={styles.text}>.</Text>
+                            </View>
+                            <View>
+                                <Text style={styles.subtitle}>Area Manager</Text>
+                                <Text style={styles.text}>{empleado?.area_manager || "N/A"}</Text>
                             </View>
                         </View>
                     </View>
