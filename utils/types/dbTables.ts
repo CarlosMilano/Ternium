@@ -11,7 +11,7 @@ export type TableEmpleado = {
     pc_cat?: string;
     habilitado?: boolean;
     cet?: string;
-    idm4: string;
+    idm4?: string;
 };
 export type TableTrayectoria = {
     id_trayectoria: number;
