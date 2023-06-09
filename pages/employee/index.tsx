@@ -206,7 +206,6 @@ const EmployeePage: React.FC = (): JSX.Element => {
                 });
                 if (res.ok) {
                     const trayectorias: TableTrayectoria[] = await res.json();
-                    console.log(trayectorias);
                     setDataTrayectoria(trayectorias);
                     updateFetchedData("dataTrayectoria", deepClone(trayectorias));
                 } else {
@@ -381,7 +380,6 @@ const EmployeePage: React.FC = (): JSX.Element => {
         e.preventDefault();
         setIsUpdatingData(true);
         dataTrayectoria?.forEach(async (trayectoria: TableTrayectoria, index: number) => {
-            console.log(trayectoria);
             try {
                 const res = await fetch("/api/updateTablaTrayectoria", {
                     method: "PUT",
@@ -412,7 +410,6 @@ const EmployeePage: React.FC = (): JSX.Element => {
             id_empleado: dataEmpleado.id_empleado,
             habilitado: enabled,
         };
-        console.log(habilitadoData);
         try {
             const res = await fetch("/api/updateEmpleadoHabilitado", {
                 method: "PUT",

@@ -20,8 +20,6 @@ export async function updateTablaTrayectoria(
 
         const values = [empresa, puesto, id_empleado, id_trayectoria];
 
-        console.log(updateQuery, values);
-
         const result: QueryResult = await client.query(updateQuery, values);
         return result;
     } finally {

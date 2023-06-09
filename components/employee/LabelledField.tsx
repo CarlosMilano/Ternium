@@ -25,7 +25,7 @@ const LabelledField: React.FC<LabelledFieldProps> = ({
 }): JSX.Element => {
     const inputElement: JSX.Element = isNumeric ? (
         <TextField
-            value={value || ""}
+            value={value === null ? "" : value}
             onChange={onChange}
             sx={{ marginRight: "1rem" }}
             inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
