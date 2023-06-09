@@ -12,6 +12,7 @@ import PictureAsPdf from "@mui/icons-material/PictureAsPdf";
 import UploadFile from "@mui/icons-material/UploadFile";
 import Navbar from "@/components/Navbar";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import Tooltip from "@mui/material/Tooltip";
 import {
     useState,
     ChangeEvent,
@@ -28,6 +29,12 @@ import { ContainedButton, DropdownButton, OutlinedButton } from "@/components/th
 import { GetPageEmpleadosRequestBody } from "./api/getPageEmpleados";
 import FilterChip from "@/components/FilterChip";
 import { FilterData, Filters } from "@/utils/types/filters";
+import JSZip from "jszip";
+import { pdf } from "@react-pdf/renderer";
+import PdfEmployee from "@/utils/pdf/PdfEmployee";
+import { saveAs } from "file-saver";
+import { AcceptDialog } from "@/components/themed/ThemeDialogs";
+import { GetAllTablesResult } from "./api/services/getAllTablesFromEmpleado";
 
 export default function Home() {
     // The text from the search bar.
@@ -36,6 +43,7 @@ export default function Home() {
     const [dataEmpleados, setDataEmpleados] = useState<TableEmpleado[] | null>(null);
     // The total amount of employees. (Currently, the index of the last employee)
     const [amountOfEmployees, setAmountOfEmployees] = useState<number>(0);
+    const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState<boolean>(false);
     // A reference to the Input button that actually uploads the user's file.
     const refInputFile: MutableRefObject<HTMLInputElement | null> = useRef<HTMLInputElement | null>(null);
     // The state of the filters.
@@ -102,6 +110,8 @@ export default function Home() {
     });
     // Describes if the employee list is being loaded.
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    // Describes if the user's download hasn't finished.
+    const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
     // The definition of the columns in the data grid.
     const columns: GridColDef<TableEmpleado>[] = [
@@ -153,7 +163,6 @@ export default function Home() {
     // Resets the pagination model each time the filters change.
     // Allows the list of employees to be updated.
     useEffect(() => {
-        console.log(filters);
         setPaginationModel({
             page: 0,
             pageSize: pageSize,
@@ -192,6 +201,66 @@ export default function Home() {
             .catch((err) => {
                 console.error(err);
             });
+    };
+
+    const closeDownloadDialog = () => {
+        if (isDownloading) return;
+        setIsDownloadDialogOpen(false);
+    };
+
+    const handleDownloadPdf: () => void = async () => {
+        if (dataEmpleados === null || dataEmpleados.length === 0) {
+            closeDownloadDialog();
+            return;
+        }
+        // Stops the dialog from being closed until the download is finished.
+        setIsDownloading(true);
+
+        const zip: JSZip = new JSZip();
+        let hasAtLeastOne: boolean = false;
+
+        for (const empleado of dataEmpleados) {
+            try {
+                const res = await fetch("/api/getAllTablesFromEmpleado", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id_empleado: empleado.id_empleado }),
+                });
+                if (!res.ok) {
+                    const error: { error: string } = await res.json();
+                    throw new Error(error.error);
+                }
+                const allTables: GetAllTablesResult = await res.json();
+                const pdfDoc = (
+                    <PdfEmployee
+                        empleado={empleado}
+                        comentarios={allTables.comentarios}
+                        evaluaciones={allTables.evaluacion}
+                        resumenes={allTables.resumen}
+                        trayectorias={allTables.trayectoria}
+                    />
+                );
+                const blob: Blob = await pdf(pdfDoc).toBlob();
+                if (blob !== null) {
+                    zip.file(`${empleado?.nombre}_ficha.pdf`, blob);
+                    hasAtLeastOne = true;
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        try {
+            if (hasAtLeastOne) {
+                const zipContent: Blob = await zip.generateAsync({ type: "blob" });
+                saveAs(zipContent, "fichas_de_empleados.zip");
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsDownloading(false);
+            closeDownloadDialog();
+        }
     };
 
     return (
@@ -237,9 +306,41 @@ export default function Home() {
                         />
                     </>
                 )}
-                <ContainedButton variant="contained" startIcon={<PictureAsPdf />}>
-                    Descargar
-                </ContainedButton>
+                <Tooltip
+                    title="Solo pueden descargarse un máximo de 10 fichas a la vez"
+                    disableFocusListener={amountOfEmployees <= 10}
+                    disableHoverListener={amountOfEmployees <= 10}
+                    disableInteractive={amountOfEmployees <= 10}
+                    disableTouchListener={amountOfEmployees <= 10}
+                    placement="left-end"
+                >
+                    <span>
+                        <ContainedButton
+                            type="button"
+                            variant="contained"
+                            disabled={amountOfEmployees > 10 || amountOfEmployees < 1}
+                            startIcon={<PictureAsPdf />}
+                            onClick={() => setIsDownloadDialogOpen(true)}
+                        >
+                            Descargar
+                        </ContainedButton>
+                    </span>
+                </Tooltip>
+                <AcceptDialog
+                    open={isDownloadDialogOpen}
+                    dialogTitle={
+                        <>
+                            Descargar
+                            <span style={{ color: "#01688A" }}> {amountOfEmployees} </span>
+                            fichas de empleado
+                        </>
+                    }
+                    disableAccept={isDownloading}
+                    onClose={closeDownloadDialog}
+                    onAccept={handleDownloadPdf}
+                >
+                    ¿Estás seguro que quieres descargar todas las fichas? Se comprimirán todas en un archivo zip.
+                </AcceptDialog>
             </Stack>
             {/* Navigation Bar */}
             <Navbar />
