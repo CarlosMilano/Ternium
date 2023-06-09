@@ -1,7 +1,7 @@
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { Editable } from "./EditSection";
-import { ChangeEventHandler, ReactNode } from "react";
+import { ChangeEventHandler, ReactNode, CSSProperties } from "react";
 
 interface LabelledFieldProps {
     label: string;
@@ -10,6 +10,7 @@ interface LabelledFieldProps {
     currentSectionIndex: number | null;
     onChange: ChangeEventHandler<HTMLInputElement>;
     isNumeric?: boolean;
+    style?: CSSProperties | undefined;
     children: ReactNode;
 }
 const LabelledField: React.FC<LabelledFieldProps> = ({
@@ -19,6 +20,7 @@ const LabelledField: React.FC<LabelledFieldProps> = ({
     currentSectionIndex,
     onChange,
     isNumeric,
+    style,
     children,
 }): JSX.Element => {
     const inputElement: JSX.Element = isNumeric ? (
@@ -33,7 +35,7 @@ const LabelledField: React.FC<LabelledFieldProps> = ({
     );
 
     return (
-        <div>
+        <div style={style}>
             <Typography variant="body1" component="p" color="grey">
                 {label}
             </Typography>
