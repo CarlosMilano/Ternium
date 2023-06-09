@@ -9,7 +9,8 @@ export default async function getTrayectoriaData(id_empleado: number): Promise<T
 
         const query: string = `
             SELECT * FROM trayectoria
-            WHERE id_empleado = ${id_empleado}
+            WHERE id_empleado = ${id_empleado} 
+            ORDER BY id_trayectoria
         `;
 
         const result: QueryResult = await client.query(query);

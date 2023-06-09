@@ -9,7 +9,8 @@ export default async function getResumenData(id_empleado: number): Promise<Table
 
         const query: string = `
             SELECT * FROM resumen
-            WHERE id_empleado = ${id_empleado}
+            WHERE id_empleado = ${id_empleado} 
+            ORDER BY id_resumen
         `;
 
         const result: QueryResult = await client.query(query);

@@ -9,7 +9,8 @@ export default async function getEvaluacionData(id_empleado: number): Promise<Ta
 
         const query: string = `
             SELECT * FROM evaluacion
-            WHERE id_empleado = ${id_empleado}
+            WHERE id_empleado = ${id_empleado} 
+            ORDER BY id_evaluacion
         `;
 
         const result: QueryResult = await client.query(query);
