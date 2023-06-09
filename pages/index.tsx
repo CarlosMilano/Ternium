@@ -378,7 +378,7 @@ export default function Home() {
         console.error(err);
       }
     }
-
+    const hola = 0;
     try {
       if (hasAtLeastOne) {
         const zipContent: Blob = await zip.generateAsync({ type: "blob" });
