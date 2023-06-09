@@ -206,6 +206,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                 });
                 if (res.ok) {
                     const trayectorias: TableTrayectoria[] = await res.json();
+                    console.log(trayectorias);
                     setDataTrayectoria(trayectorias);
                     updateFetchedData("dataTrayectoria", deepClone(trayectorias));
                 } else {
@@ -380,6 +381,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
         e.preventDefault();
         setIsUpdatingData(true);
         dataTrayectoria?.forEach(async (trayectoria: TableTrayectoria, index: number) => {
+            console.log(trayectoria);
             try {
                 const res = await fetch("/api/updateTablaTrayectoria", {
                     method: "PUT",
@@ -557,6 +559,35 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                         </Stack>
                                     </Stack>
                                     <Grid container rowGap={2}>
+                                        {/* ID */}
+                                        <Grid item md={3} sm={4} xs={6}>
+                                            <Typography variant="body1" component="p" color="grey">
+                                                ID
+                                            </Typography>
+                                            <Typography variant="body1" component="p">
+                                                {dataEmpleado ? dataEmpleado?.id_empleado : <Skeleton width="80%" />}
+                                            </Typography>
+                                        </Grid>
+                                        {/* CET */}
+                                        <Grid item md={3} sm={4} xs={6}>
+                                            <Typography variant="body1" component="p" color="grey">
+                                                CET
+                                            </Typography>
+                                            <Typography variant="body1" component="p">
+                                                {dataEmpleado ? dataEmpleado?.cet : <Skeleton width="80%" />}
+                                            </Typography>
+                                        </Grid>
+                                        {/* IDM4 */}
+                                        <Grid item md={3} sm={4} xs={6}>
+                                            <Typography variant="body1" component="p" color="grey">
+                                                IDM4
+                                            </Typography>
+                                            <Typography variant="body1" component="p">
+                                                {dataEmpleado ? dataEmpleado?.idm4 : <Skeleton width="80%" />}
+                                            </Typography>
+                                        </Grid>
+                                        {/* Empty Slot */}
+                                        <Grid item md={3} sm={4} xs={6}></Grid>
                                         {/* Edad */}
                                         <Grid item md={3} sm={4} xs={6}>
                                             <LabelledField
@@ -588,22 +619,6 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                             >
                                                 <Typography variant="body1" component="p">
                                                     {dataEmpleado ? dataEmpleado?.antiguedad : <Skeleton width="80%" />}
-                                                </Typography>
-                                            </LabelledField>
-                                        </Grid>
-                                        {/* Estudios */}
-                                        <Grid item md={3} sm={4} xs={6}>
-                                            <LabelledField
-                                                label="Estudios"
-                                                value={dataEmpleado?.estudios}
-                                                sectionIndex={0}
-                                                currentSectionIndex={editSectionIndex}
-                                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                                    updateDataEmpleado("estudios", e.target.value)
-                                                }
-                                            >
-                                                <Typography variant="body1" component="p">
-                                                    {dataEmpleado ? dataEmpleado?.estudios : <Skeleton width="80%" />}
                                                 </Typography>
                                             </LabelledField>
                                         </Grid>
@@ -978,10 +993,13 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                         potencial,
                                                         curva,
                                                     }: TableEvaluacion,
-                                                    index: number,
-                                                    arr: TableEvaluacion[]
+                                                    index: number
                                                 ) => {
-                                                    const isLast: boolean = index === arr.length - 1;
+                                                    const onChangeAnio: ChangeEventHandler<HTMLInputElement> = (
+                                                        e: ChangeEvent<HTMLInputElement>
+                                                    ) => {
+                                                        updateDataEvaluacion(`${index}.año`, e.target.value);
+                                                    };
                                                     const onChangePerformance: ChangeEventHandler<HTMLInputElement> = (
                                                         e: ChangeEvent<HTMLInputElement>
                                                     ) => {
@@ -1006,15 +1024,23 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                                 }}
                                                             >
                                                                 {/* Año */}
-                                                                <Typography
-                                                                    variant="body1"
-                                                                    component="p"
-                                                                    textAlign="end"
-                                                                    width="100%"
-                                                                    color="grey"
+                                                                <LabelledField
+                                                                    label=""
+                                                                    value={año}
+                                                                    sectionIndex={3}
+                                                                    currentSectionIndex={editSectionIndex}
+                                                                    onChange={onChangeAnio}
+                                                                    style={{ alignSelf: "flex-end" }}
                                                                 >
-                                                                    {año}
-                                                                </Typography>
+                                                                    <Typography
+                                                                        variant="body1"
+                                                                        component="p"
+                                                                        width="100%"
+                                                                        color="grey"
+                                                                    >
+                                                                        {año}
+                                                                    </Typography>
+                                                                </LabelledField>
                                                                 {/* Performance */}
                                                                 <LabelledField
                                                                     label="Performance"
@@ -1104,7 +1130,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                                 }}
                                                             >
                                                                 {/* Año */}
-                                                                <Typography
+                                                                {/* <Typography
                                                                     variant="body1"
                                                                     component="p"
                                                                     textAlign="end"
@@ -1112,7 +1138,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                                     color="grey"
                                                                 >
                                                                     Sin año
-                                                                </Typography>
+                                                                </Typography> */}
                                                                 {/* Empresa */}
                                                                 <LabelledField
                                                                     label="Empresa"
