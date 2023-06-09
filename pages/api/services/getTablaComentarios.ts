@@ -9,7 +9,8 @@ export default async function getComentariosData(id_empleado: number): Promise<T
 
         const query: string = `
             SELECT * FROM comentarios
-            WHERE id_empleado = ${id_empleado}
+            WHERE id_empleado = ${id_empleado} 
+            ORDER BY id_comentario
         `;
 
         const result: QueryResult = await client.query(query);
