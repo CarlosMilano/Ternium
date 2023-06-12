@@ -42,6 +42,8 @@ import { GetAllTablesResult } from "./api/services/getAllTablesFromEmpleado";
 import { CSVLink } from "react-csv";
 import { Box, Button } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
+import {ref, uploadBytes }from "firebase/storage"
+import {storage} from "../config/environment/firebase/index"
 
 export default function Home() {
   // The text from the search bar.
@@ -314,23 +316,53 @@ export default function Home() {
   };
 
   // Uploads the .csv file uploaded by the user.
-  const handleFileUpload: ChangeEventHandler<HTMLInputElement> = (
-    e: ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files === null || e.target.files.length === 0) return;
     const csvFile: File = e.target.files[0];
-    const formData = new FormData();
-    formData.append("file", csvFile);
-
-    axios
-      .post("/api/upload", formData)
-      .then((res) => {
-        console.log(res.data);
+    const storageRef = ref(storage, 'csvFiles/' + csvFile.name);
+  
+    uploadBytes(storageRef, csvFile)
+      .then((snapshot) => {
+        console.log(snapshot);
+  
+        processCSVFile(csvFile.name);
       })
       .catch((err) => {
         console.error(err);
       });
   };
+  
+  const processCSVFile = (fileName: string) => {
+
+    fetch('/api/upload', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ file: fileName }), 
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Error al procesar el archivo CSV');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data); 
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+  
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+const handleUploadClick = () => {
+      if (fileInputRef.current) {
+        fileInputRef.current.click();
+      }
+    }
 
   const closeDownloadDialog = () => {
     if (isDownloading) return;
@@ -416,24 +448,20 @@ export default function Home() {
         {!md && (
           <>
             <OutlinedButton
-              variant='outlined'
-              startIcon={<UploadFile />}
-              type='button'
-              onClick={() => {
-                if (refInputFile === null || refInputFile.current === null)
-                  return;
-                refInputFile.current.click();
-              }}
-            >
-              Subir
-            </OutlinedButton>
-            <input
-              ref={refInputFile}
-              type='file'
-              style={{ display: "none" }}
-              onChange={handleFileUpload}
-              accept='.csv'
-            />
+                            variant="outlined"
+                            startIcon={<UploadFile />}
+                            type="button"
+                            onClick={handleUploadClick}
+                        >
+                            Subir
+                        </OutlinedButton>
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            style={{ display: "none" }}
+                            onChange={handleFileUpload}
+                            accept=".csv"
+                        />
           </>
         )}
         <Tooltip
