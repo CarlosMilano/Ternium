@@ -1,4 +1,3 @@
-import axios from "axios";
 import Head from "next/head";
 import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 import Skeleton from "@mui/material/Skeleton";
@@ -28,6 +27,8 @@ import { ContainedButton, DropdownButton, OutlinedButton } from "@/components/th
 import { GetPageEmpleadosRequestBody } from "./api/getPageEmpleados";
 import FilterChip from "@/components/FilterChip";
 import { FilterData, Filters } from "@/utils/types/filters";
+import {ref, uploadBytes }from "firebase/storage"
+import {storage} from "../config/environment/firebase/index"
 
 export default function Home() {
     // The text from the search bar.
@@ -178,21 +179,53 @@ export default function Home() {
     };
 
     // Uploads the .csv file uploaded by the user.
-    const handleFileUpload: ChangeEventHandler<HTMLInputElement> = (e: ChangeEvent<HTMLInputElement>) => {
+    const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files === null || e.target.files.length === 0) return;
         const csvFile: File = e.target.files[0];
-        const formData = new FormData();
-        formData.append("file", csvFile);
+        const storageRef = ref(storage, 'csvFiles/' + csvFile.name);
+      
+        uploadBytes(storageRef, csvFile)
+          .then((snapshot) => {
+            console.log(snapshot);
+      
+            processCSVFile(csvFile.name);
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      };
+      
+      const processCSVFile = (fileName: string) => {
 
-        axios
-            .post("/api/upload", formData)
-            .then((res) => {
-                console.log(res.data);
-            })
-            .catch((err) => {
-                console.error(err);
-            });
-    };
+        fetch('/api/upload', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ file: fileName }), 
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error('Error al procesar el archivo CSV');
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log(data); 
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      };
+      
+
+      const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleUploadClick = () => {
+          if (fileInputRef.current) {
+            fileInputRef.current.click();
+          }
+        }
 
     return (
         <>
@@ -221,15 +254,12 @@ export default function Home() {
                             variant="outlined"
                             startIcon={<UploadFile />}
                             type="button"
-                            onClick={() => {
-                                if (refInputFile === null || refInputFile.current === null) return;
-                                refInputFile.current.click();
-                            }}
+                            onClick={handleUploadClick}
                         >
                             Subir
                         </OutlinedButton>
                         <input
-                            ref={refInputFile}
+                            ref={fileInputRef}
                             type="file"
                             style={{ display: "none" }}
                             onChange={handleFileUpload}
