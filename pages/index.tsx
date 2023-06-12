@@ -314,23 +314,53 @@ export default function Home() {
   };
 
   // Uploads the .csv file uploaded by the user.
-  const handleFileUpload: ChangeEventHandler<HTMLInputElement> = (
-    e: ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files === null || e.target.files.length === 0) return;
     const csvFile: File = e.target.files[0];
-    const formData = new FormData();
-    formData.append("file", csvFile);
-
-    axios
-      .post("/api/upload", formData)
-      .then((res) => {
-        console.log(res.data);
+    const storageRef = ref(storage, 'csvFiles/' + csvFile.name);
+  
+    uploadBytes(storageRef, csvFile)
+      .then((snapshot) => {
+        console.log(snapshot);
+  
+        processCSVFile(csvFile.name);
       })
       .catch((err) => {
         console.error(err);
       });
   };
+  
+  const processCSVFile = (fileName: string) => {
+
+    fetch('/api/upload', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ file: fileName }), 
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Error al procesar el archivo CSV');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data); 
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+  
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+const handleUploadClick = () => {
+      if (fileInputRef.current) {
+        fileInputRef.current.click();
+      }
+    }
 
   const closeDownloadDialog = () => {
     if (isDownloading) return;
