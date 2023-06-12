@@ -446,24 +446,20 @@ const handleUploadClick = () => {
         {!md && (
           <>
             <OutlinedButton
-              variant='outlined'
-              startIcon={<UploadFile />}
-              type='button'
-              onClick={() => {
-                if (refInputFile === null || refInputFile.current === null)
-                  return;
-                refInputFile.current.click();
-              }}
-            >
-              Subir
-            </OutlinedButton>
-            <input
-              ref={refInputFile}
-              type='file'
-              style={{ display: "none" }}
-              onChange={handleFileUpload}
-              accept='.csv'
-            />
+                            variant="outlined"
+                            startIcon={<UploadFile />}
+                            type="button"
+                            onClick={handleUploadClick}
+                        >
+                            Subir
+                        </OutlinedButton>
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            style={{ display: "none" }}
+                            onChange={handleFileUpload}
+                            accept=".csv"
+                        />
           </>
         )}
         <Tooltip
