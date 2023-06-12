@@ -42,6 +42,8 @@ import { GetAllTablesResult } from "./api/services/getAllTablesFromEmpleado";
 import { CSVLink } from "react-csv";
 import { Box, Button } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
+import {ref, uploadBytes }from "firebase/storage"
+import {storage} from "../config/environment/firebase/index"
 
 export default function Home() {
   // The text from the search bar.
