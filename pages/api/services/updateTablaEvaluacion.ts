@@ -6,7 +6,7 @@ export async function updateTablaEvaluacion(
     curva: string | null,
     año: number | null,
     performance: number | null,
-    potencial: string | null,
+    potencial: number | null,
     id_empleado: number
 ): Promise<QueryResult> {
     const client = await pool.connect();
