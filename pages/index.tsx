@@ -364,6 +364,45 @@ const handleUploadClick = () => {
       }
     }
 
+    const handleFileUploadEvalucaion = (e: ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files === null || e.target.files.length === 0) return;
+      const csvFile: File = e.target.files[0];
+      const storageRef = ref(storage, 'uploads/' + csvFile.name);
+    
+      uploadBytes(storageRef, csvFile)
+        .then((snapshot) => {
+          console.log(snapshot);
+    
+          processCSVFile(csvFile.name);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    };
+    
+    const processCSVFileEvaluacion = (fileName: string) => {
+
+      fetch('/api/uploadEvaluacion', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ file: fileName }), 
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Error al procesar el archivo CSV');
+          }
+          return response.json();
+        })
+        .then((data) => {
+          console.log(data); 
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    };
+
   const closeDownloadDialog = () => {
     if (isDownloading) return;
     setIsDownloadDialogOpen(false);
