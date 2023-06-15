@@ -9,6 +9,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         res.status(200).json({});
     } catch (error) {
-        res.status(500).json({ error: "Error updating habilitado." });
+        res.status(500).json({ error: `Error: ${error}` });
     }
 }

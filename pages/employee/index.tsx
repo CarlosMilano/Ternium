@@ -103,6 +103,13 @@ const EmployeePage: React.FC = (): JSX.Element => {
     const [isUpdatingData, setIsUpdatingData] = useState<boolean>(false);
     // Determines if the disable/enable/delete dialog is opened.
     const [isDisableDialogOpened, setIsDisableDialogOpened] = useState<boolean>(false);
+    // Controls the data for a new comment from the user.
+    const [newComment, updateNewComment, setNewComment] = useObjectState<TableComentarios>({
+        id_comentario: -1,
+        id_empleado: -1,
+        comentario: undefined,
+        nota: undefined,
+    });
 
     const md: boolean = useMediaQuery("(max-width: 900px)");
     const router = useRouter();
@@ -223,6 +230,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
             router.push("/");
             return;
         }
+        updateNewComment("id_empleado", id);
         const idEmpleado: number = Number(id);
         fetchData(idEmpleado);
     }, []);
@@ -247,6 +255,8 @@ const EmployeePage: React.FC = (): JSX.Element => {
                 break;
             case "comentarios":
                 resetData(setDataComentarios, fetchedData.dataComentarios);
+                updateNewComment("comentario", undefined);
+                updateNewComment("nota", undefined);
                 break;
             case "resumen":
                 resetData(setDataResumen, fetchedData.dataResumen);
@@ -299,22 +309,53 @@ const EmployeePage: React.FC = (): JSX.Element => {
                     body: JSON.stringify(comentario),
                 });
                 if (res.ok) {
-                    const result = await res.json();
                     resetProperty(updateFetchedData, `dataComentarios.${index}`, comentario);
-                    // updateFetchedData(`dataComentarios.${index}`, comentario);
                 } else {
                     console.error("Error updating data for Comentarios: ", res.statusText);
                     resetProperty(updateDataComentarios, `${index}`, fetchedData.dataComentarios?.at(index));
-                    // const previousData: TableComentarios | null = fetchedData.dataComentarios?.at(index) || null;
-                    // updateDataComentarios(`${index}`, previousData);
                 }
             } catch (err) {
                 console.error("Error updating data for Comentarios");
+                resetProperty(updateDataComentarios, `${index}`, fetchedData.dataComentarios?.at(index));
             } finally {
                 setEditSectionIndex(null);
                 setIsUpdatingData(false);
             }
         });
+        if (
+            dataComentarios !== null &&
+            newComment.nota !== null &&
+            newComment.nota !== undefined &&
+            newComment.comentario != null
+        ) {
+            try {
+                const resCreate = await fetch("/api/addComentario", {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(newComment),
+                });
+                if (resCreate.ok) {
+                    const { id_comentario } = await resCreate.json();
+                    const comment: TableComentarios = deepClone(newComment);
+                    comment.id_comentario = id_comentario;
+                    console.log(id_comentario);
+                    const newDataComentarios: TableComentarios[] = [...dataComentarios, comment];
+                    updateFetchedData("dataComentarios", deepClone(newDataComentarios));
+                    setDataComentarios(deepClone(newDataComentarios));
+                } else {
+                    const { error } = await resCreate.json();
+                    console.error(`Error adding a new comment: ${resCreate.statusText} || ${error}`);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        } else {
+            console.log("Either note or comment blank.");
+        }
+        updateNewComment("comentario", undefined);
+        updateNewComment("nota", undefined);
     };
     const handleOnSubmitResumen: FormEventHandler<HTMLFormElement> = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -435,9 +476,13 @@ const EmployeePage: React.FC = (): JSX.Element => {
                 },
                 body: JSON.stringify(deleteData),
             });
+            if (!res.ok) {
+                const { error } = await res.json();
+                console.error(`Error: ${res.statusText} | ${error}`);
+            }
             router.push("/");
         } catch (err) {
-            console.error("Error updating habilitado from employee.");
+            console.error(`Error deleting employee: ${err}`);
         }
     };
 
@@ -741,88 +786,142 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                 <TableBody>
                                                     {dataComentarios ? (
                                                         // Tabla comentarios.
-                                                        dataComentarios?.map(
-                                                            (
-                                                                { id_comentario, nota, comentario }: TableComentarios,
-                                                                index: number
-                                                            ) => {
-                                                                const onChangeNota: ChangeEventHandler<
-                                                                    HTMLInputElement
-                                                                > = (e: ChangeEvent<HTMLInputElement>) => {
-                                                                    updateDataComentarios(
-                                                                        `${index}.nota`,
-                                                                        e.target.value
+                                                        <>
+                                                            {dataComentarios?.map(
+                                                                (
+                                                                    {
+                                                                        id_comentario,
+                                                                        nota,
+                                                                        comentario,
+                                                                    }: TableComentarios,
+                                                                    index: number
+                                                                ) => {
+                                                                    const onChangeNota: ChangeEventHandler<
+                                                                        HTMLInputElement
+                                                                    > = (e: ChangeEvent<HTMLInputElement>) => {
+                                                                        updateDataComentarios(
+                                                                            `${index}.nota`,
+                                                                            e.target.value
+                                                                        );
+                                                                    };
+                                                                    const onChangeComentario: ChangeEventHandler<
+                                                                        HTMLInputElement
+                                                                    > = (e: ChangeEvent<HTMLInputElement>) => {
+                                                                        updateDataComentarios(
+                                                                            `${index}.comentario`,
+                                                                            e.target.value
+                                                                        );
+                                                                    };
+                                                                    const inputElementNota: JSX.Element = (
+                                                                        <TextField
+                                                                            value={nota || ""}
+                                                                            onChange={onChangeNota}
+                                                                            size="small"
+                                                                            inputProps={{
+                                                                                inputMode: "numeric",
+                                                                                pattern: "[0-9]*",
+                                                                            }}
+                                                                        />
                                                                     );
-                                                                };
-                                                                const onChangeComentario: ChangeEventHandler<
-                                                                    HTMLInputElement
-                                                                > = (e: ChangeEvent<HTMLInputElement>) => {
-                                                                    updateDataComentarios(
-                                                                        `${index}.comentario`,
-                                                                        e.target.value
+                                                                    const inputElementComentario: JSX.Element = (
+                                                                        <TextField
+                                                                            value={comentario || ""}
+                                                                            onChange={onChangeComentario}
+                                                                            size="small"
+                                                                            fullWidth
+                                                                        />
                                                                     );
-                                                                };
-                                                                const inputElementNota: JSX.Element = (
-                                                                    <TextField
-                                                                        value={nota || ""}
-                                                                        onChange={onChangeNota}
-                                                                        size="small"
-                                                                        inputProps={{
-                                                                            inputMode: "numeric",
-                                                                            pattern: "[0-9]*",
-                                                                        }}
-                                                                    />
-                                                                );
-                                                                const inputElementComentario: JSX.Element = (
-                                                                    <TextField
-                                                                        value={comentario || ""}
-                                                                        onChange={onChangeComentario}
-                                                                        size="small"
-                                                                        fullWidth
-                                                                    />
-                                                                );
 
-                                                                return (
-                                                                    <TableRow key={id_comentario}>
-                                                                        <TableCell align="center" sx={{ maxWidth: 75 }}>
-                                                                            <Editable
-                                                                                sectionIndex={1}
-                                                                                currentSectionIndex={editSectionIndex}
-                                                                                inputElement={inputElementNota}
-                                                                            >
-                                                                                {nota}
-                                                                            </Editable>
-                                                                        </TableCell>
-                                                                        <TableCell>
-                                                                            <Editable
-                                                                                sectionIndex={1}
-                                                                                currentSectionIndex={editSectionIndex}
-                                                                                inputElement={inputElementComentario}
-                                                                            >
-                                                                                {comentario}
-                                                                            </Editable>
-                                                                        </TableCell>
-                                                                        {editSectionIndex === 1 && (
+                                                                    return (
+                                                                        <TableRow key={id_comentario}>
                                                                             <TableCell
                                                                                 align="center"
-                                                                                sx={{ width: 50 }}
+                                                                                sx={{ maxWidth: 75 }}
                                                                             >
-                                                                                <IconButton
-                                                                                    size={md ? "small" : "large"}
-                                                                                    onClick={() =>
-                                                                                        handleOnClickDeleteComentario(
-                                                                                            id_comentario
-                                                                                        )
+                                                                                <Editable
+                                                                                    sectionIndex={1}
+                                                                                    currentSectionIndex={
+                                                                                        editSectionIndex
+                                                                                    }
+                                                                                    inputElement={inputElementNota}
+                                                                                >
+                                                                                    {nota}
+                                                                                </Editable>
+                                                                            </TableCell>
+                                                                            <TableCell>
+                                                                                <Editable
+                                                                                    sectionIndex={1}
+                                                                                    currentSectionIndex={
+                                                                                        editSectionIndex
+                                                                                    }
+                                                                                    inputElement={
+                                                                                        inputElementComentario
                                                                                     }
                                                                                 >
-                                                                                    <Delete />
-                                                                                </IconButton>
+                                                                                    {comentario}
+                                                                                </Editable>
                                                                             </TableCell>
-                                                                        )}
-                                                                    </TableRow>
-                                                                );
-                                                            }
-                                                        )
+                                                                            {editSectionIndex === 1 && (
+                                                                                <TableCell
+                                                                                    align="center"
+                                                                                    sx={{ width: 50 }}
+                                                                                >
+                                                                                    <IconButton
+                                                                                        size={md ? "small" : "large"}
+                                                                                        onClick={() =>
+                                                                                            handleOnClickDeleteComentario(
+                                                                                                id_comentario
+                                                                                            )
+                                                                                        }
+                                                                                    >
+                                                                                        <Delete />
+                                                                                    </IconButton>
+                                                                                </TableCell>
+                                                                            )}
+                                                                        </TableRow>
+                                                                    );
+                                                                }
+                                                            )}
+                                                            {editSectionIndex === 1 && (
+                                                                <TableRow>
+                                                                    <TableCell align="center" sx={{ maxWidth: 75 }}>
+                                                                        <TextField
+                                                                            value={newComment.nota || ""}
+                                                                            onChange={(
+                                                                                e: ChangeEvent<HTMLInputElement>
+                                                                            ) => {
+                                                                                updateNewComment(
+                                                                                    "nota",
+                                                                                    e.target.value
+                                                                                );
+                                                                            }}
+                                                                            size="small"
+                                                                            inputProps={{
+                                                                                inputMode: "numeric",
+                                                                                pattern: "[0-9]*",
+                                                                            }}
+                                                                            placeholder="10"
+                                                                        />
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        <TextField
+                                                                            value={newComment.comentario || ""}
+                                                                            onChange={(
+                                                                                e: ChangeEvent<HTMLInputElement>
+                                                                            ) => {
+                                                                                updateNewComment(
+                                                                                    "comentario",
+                                                                                    e.target.value
+                                                                                );
+                                                                            }}
+                                                                            size="small"
+                                                                            placeholder="Escribe aquí un nuevo comentario..."
+                                                                            fullWidth
+                                                                        />
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            )}
+                                                        </>
                                                     ) : (
                                                         // Loading skeleton for table Comentarios.
                                                         <>
