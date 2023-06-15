@@ -91,11 +91,11 @@ export default function handler(req, res) {
                       ];
 
                       // Tabla Evaluacion
-                      const { id_evaluacion, año, performance, potencial, curva } = row;
+                      const { id_evaluacion, anio, performance, potencial, curva } = row;
 
                       const evaluacionQuery =
                         'INSERT INTO evaluacion(id_evaluacion, año, performance, potencial, curva, id_empleado) VALUES($1, $2, $3, $4, $5, $6)';
-                      const evaluacionValues = [id_evaluacion, año, performance, potencial, curva, id_empleado];
+                      const evaluacionValues = [id_evaluacion, anio, performance, potencial, curva, id_empleado];
 
                       // Tabla Resumen
                       const { id_resumen, resumen_perfil } = row;

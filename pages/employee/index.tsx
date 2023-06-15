@@ -192,6 +192,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                 });
                 if (res.ok) {
                     const evaluaciones: TableEvaluacion[] = await res.json();
+                    console.log(evaluaciones)
                     setDataEvaluacion(evaluaciones);
                     updateFetchedData("dataEvaluacion", deepClone(evaluaciones));
                 } else {

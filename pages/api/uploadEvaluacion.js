@@ -49,11 +49,11 @@ export default function handler(req, res) {
                     const insertPromises = results.map((row) => {
 
                       // Tabla Evaluacion
-                      const { id_evaluacion, año, performance, potencial, curva, id_empleado } = row;
+                      const { id_evaluacion, anio, performance, potencial, curva, id_empleado } = row;
 
                       const evaluacionQuery =
                         'INSERT INTO evaluacion(id_empleado, id_evaluacion, año, performance, potencial, curva) VALUES($1, $2, $3, $4, $5, $6)';
-                      const evaluacionValues = [id_empleado, id_evaluacion, año, performance, potencial, curva];
+                      const evaluacionValues = [id_empleado, id_evaluacion, anio, performance, potencial, curva];
 
                       const promises = [
                         client.query(evaluacionQuery, evaluacionValues),
