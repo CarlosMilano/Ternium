@@ -1158,9 +1158,7 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                                                     onChange={onChangePotencial}
                                                                 >
                                                                     <Typography variant="body1" component="p">
-                                                                        {potencial && potencial > 3
-                                                                            ? "AP (MT)"
-                                                                            : "PROM (M)"}
+                                                                        {potencial || ""}
                                                                     </Typography>
                                                                 </LabelledField>
                                                                 {/* Curva */}
