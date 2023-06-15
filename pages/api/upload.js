@@ -62,10 +62,14 @@ export default function handler(req, res) {
                         fecha_nacimiento,
                         cet,
                         idm4,
+                        estructura3,
+                        estructura4,
+                        estructura5,
+                        key_talent
                       } = row;
 
                       const empleadoQuery =
-                        'INSERT INTO empleado(id_empleado, nombre, edad, antiguedad, universidad, area_manager, direccion, puesto, pc_cat, habilitado, fecha_nacimiento, cet, idm4) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)';
+                        'INSERT INTO empleado(id_empleado, nombre, edad, antiguedad, universidad, area_manager, direccion, puesto, pc_cat, habilitado, fecha_nacimiento, cet, idm4, estructura3, estructura4, estructura5, key_talent) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)';
                       const empleadoValues = [
                         id_empleado,
                         nombre,
@@ -80,6 +84,10 @@ export default function handler(req, res) {
                         fecha_nacimiento,
                         cet,
                         idm4,
+                        estructura3,
+                        estructura4,
+                        estructura5,
+                        key_talent
                       ];
 
                       // Tabla Evaluacion

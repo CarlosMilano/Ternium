@@ -12,6 +12,10 @@ export type TableEmpleado = {
     habilitado?: boolean;
     cet?: string;
     idm4?: string;
+    estructura3?: string;
+    estructura4?: string;
+    estructura5?: string;
+    key_talent?: boolean;
 };
 export type TableTrayectoria = {
     id_trayectoria: number;
@@ -35,7 +39,7 @@ export type TableEvaluacion = {
     id_evaluacion: number;
     año?: number;
     performance?: number;
-    potencial?: number;
+    potencial?: string;
     curva?: string;
     id_empleado: number;
 };

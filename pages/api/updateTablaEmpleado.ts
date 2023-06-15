@@ -18,6 +18,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         pc_cat,
         habilitado,
         id_empleado,
+        estructura3,
+        estructura4,
+        estructura5,
+        key_talent,
     }: TableEmpleado = req.body;
 
     try {
@@ -31,7 +35,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             puesto || null,
             pc_cat || null,
             habilitado || null,
-            id_empleado
+            id_empleado,
+            estructura3 || null,
+            estructura4 || null,
+            estructura5 || null,
+            key_talent || null,
         );
         res.status(200).json(result);
     } catch (error) {
