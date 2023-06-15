@@ -39,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             estructura3 || null,
             estructura4 || null,
             estructura5 || null,
-            key_talent || null,
+            key_talent !== undefined ? key_talent : null
         );
         res.status(200).json(result);
     } catch (error) {

@@ -192,7 +192,6 @@ const EmployeePage: React.FC = (): JSX.Element => {
                 });
                 if (res.ok) {
                     const evaluaciones: TableEvaluacion[] = await res.json();
-                    console.log(evaluaciones)
                     setDataEvaluacion(evaluaciones);
                     updateFetchedData("dataEvaluacion", deepClone(evaluaciones));
                 } else {
@@ -341,7 +340,6 @@ const EmployeePage: React.FC = (): JSX.Element => {
                     const { id_comentario } = await resCreate.json();
                     const comment: TableComentarios = deepClone(newComment);
                     comment.id_comentario = id_comentario;
-                    console.log(id_comentario);
                     const newDataComentarios: TableComentarios[] = [...dataComentarios, comment];
                     updateFetchedData("dataComentarios", deepClone(newDataComentarios));
                     setDataComentarios(deepClone(newDataComentarios));
@@ -352,8 +350,6 @@ const EmployeePage: React.FC = (): JSX.Element => {
             } catch (err) {
                 console.error(err);
             }
-        } else {
-            console.log("Either note or comment blank.");
         }
         updateNewComment("comentario", undefined);
         updateNewComment("nota", undefined);
@@ -750,6 +746,91 @@ const EmployeePage: React.FC = (): JSX.Element => {
                                             >
                                                 <Typography variant="body1" component="p">
                                                     {dataEmpleado ? dataEmpleado?.pc_cat : <Skeleton width="80%" />}
+                                                </Typography>
+                                            </LabelledField>
+                                        </Grid>
+                                        {/* Key Talent */}
+                                        <Grid item md={3} sm={4} xs={6}>
+                                            <LabelledField
+                                                label="Key Talent (KT)"
+                                                value={dataEmpleado?.key_talent}
+                                                sectionIndex={0}
+                                                currentSectionIndex={editSectionIndex}
+                                                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                                    updateDataEmpleado("key_talent", e.target.value === "Sí");
+                                                }}
+                                                isBoolean
+                                            >
+                                                <Typography variant="body1" component="p">
+                                                    {dataEmpleado ? (
+                                                        dataEmpleado?.key_talent ? (
+                                                            "Sí"
+                                                        ) : (
+                                                            "No"
+                                                        )
+                                                    ) : (
+                                                        <Skeleton width="80%" />
+                                                    )}
+                                                </Typography>
+                                            </LabelledField>
+                                        </Grid>
+                                        {/* ESTRUCTURA 3 */}
+                                        <Grid item md={3} sm={4} xs={6}>
+                                            <LabelledField
+                                                label="Estructura 3"
+                                                value={dataEmpleado?.estructura3}
+                                                sectionIndex={0}
+                                                currentSectionIndex={editSectionIndex}
+                                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                                    updateDataEmpleado("estructura3", e.target.value)
+                                                }
+                                            >
+                                                <Typography variant="body1" component="p">
+                                                    {dataEmpleado ? (
+                                                        dataEmpleado?.estructura3
+                                                    ) : (
+                                                        <Skeleton width="80%" />
+                                                    )}
+                                                </Typography>
+                                            </LabelledField>
+                                        </Grid>
+                                        {/* ESTRUCTURA 4 */}
+                                        <Grid item md={3} sm={4} xs={6}>
+                                            <LabelledField
+                                                label="Estructura 4"
+                                                value={dataEmpleado?.estructura4}
+                                                sectionIndex={0}
+                                                currentSectionIndex={editSectionIndex}
+                                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                                    updateDataEmpleado("estructura4", e.target.value)
+                                                }
+                                            >
+                                                <Typography variant="body1" component="p">
+                                                    {dataEmpleado ? (
+                                                        dataEmpleado?.estructura4
+                                                    ) : (
+                                                        <Skeleton width="80%" />
+                                                    )}
+                                                </Typography>
+                                            </LabelledField>
+                                        </Grid>
+                                        {/* ESTRUCTURA 5 */}
+                                        <Grid item md={3} sm={4} xs={6}>
+                                            <LabelledField
+                                                label="Estructura 5"
+                                                value={dataEmpleado?.estructura5}
+                                                sectionIndex={0}
+                                                currentSectionIndex={editSectionIndex}
+                                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                                    updateDataEmpleado("estructura5", e.target.value)
+                                                }
+                                            >
+                                                <Typography variant="body1" component="p">
+                                                    {dataEmpleado ? (
+                                                        dataEmpleado?.estructura5
+                                                    ) : (
+                                                        <Skeleton width="80%" />
+                                                    )}
                                                 </Typography>
                                             </LabelledField>
                                         </Grid>

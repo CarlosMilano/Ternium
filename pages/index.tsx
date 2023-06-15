@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridPaginationModel, ValueOptions } from "@mui/x-data-grid";
 import Skeleton from "@mui/material/Skeleton";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
@@ -148,9 +148,19 @@ export default function Home() {
             sortable: false,
         },
         {
+            field: "key_talent",
+            headerName: "KT",
+            flex: 0.4,
+            minWidth: 50,
+            sortable: false,
+            valueFormatter(params) {
+                return params.value ? "Sí" : "No";
+            },
+        },
+        {
             field: "antiguedad",
             headerName: "Antigüedad",
-            flex: 0.6,
+            flex: 0.5,
             minWidth: 80,
             sortable: false,
         },
